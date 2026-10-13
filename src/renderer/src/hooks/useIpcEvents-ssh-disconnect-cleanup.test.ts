@@ -160,6 +160,8 @@ describe('useIpcEvents updater integration', () => {
           onCloseSessionTab: () => () => {},
           onSessionTabCloseRequest: () => () => {},
           respondSessionTabClose: () => {},
+          onRecipeWorktreeCreateRequest: () => () => {},
+          respondRecipeWorktreeCreate: () => {},
           onMoveSessionTab: () => () => {},
           onOpenFileFromMobile: () => () => {},
           onOpenDiffFromMobile: () => () => {},

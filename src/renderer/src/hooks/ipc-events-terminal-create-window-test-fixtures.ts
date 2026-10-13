@@ -119,6 +119,8 @@ export function buildTerminalCreateWindow(args: {
         onCloseSessionTab: () => () => {},
         onSessionTabCloseRequest: () => () => {},
         respondSessionTabClose: () => {},
+        onRecipeWorktreeCreateRequest: () => () => {},
+        respondRecipeWorktreeCreate: () => {},
         onMoveSessionTab: () => () => {},
         onOpenFileFromMobile: () => () => {},
         onOpenDiffFromMobile: () => () => {},

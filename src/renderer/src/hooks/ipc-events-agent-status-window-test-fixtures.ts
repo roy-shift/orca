@@ -61,6 +61,8 @@ export function buildWindowApi(args: {
         onCloseSessionTab: () => () => {},
         onSessionTabCloseRequest: () => () => {},
         respondSessionTabClose: () => {},
+        onRecipeWorktreeCreateRequest: () => () => {},
+        respondRecipeWorktreeCreate: () => {},
         onMoveSessionTab: () => () => {},
         onOpenFileFromMobile: () => () => {},
         onOpenDiffFromMobile: () => () => {},

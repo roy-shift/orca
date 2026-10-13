@@ -174,6 +174,8 @@ describe('useIpcEvents browser tab create routing', () => {
           onCloseSessionTab: () => () => {},
           onSessionTabCloseRequest: () => () => {},
           respondSessionTabClose: () => {},
+          onRecipeWorktreeCreateRequest: () => () => {},
+          respondRecipeWorktreeCreate: () => {},
           onMoveSessionTab: () => () => {},
           onOpenFileFromMobile: () => () => {},
           onOpenDiffFromMobile: () => () => {},

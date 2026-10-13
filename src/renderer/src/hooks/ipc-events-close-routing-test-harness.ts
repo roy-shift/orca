@@ -199,6 +199,8 @@ export async function useIpcEventsForCloseRouting({
           return () => {}
         },
         respondSessionTabClose,
+        onRecipeWorktreeCreateRequest: () => () => {},
+        respondRecipeWorktreeCreate: () => {},
         onMoveSessionTab: () => () => {},
         onOpenFileFromMobile: () => () => {},
         onOpenDiffFromMobile: () => () => {},
