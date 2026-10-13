@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
+import { Cloud } from 'lucide-react'
 import { Popover, PopoverContent } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
@@ -17,12 +18,11 @@ import {
 } from './RunTargetComboboxRow'
 import {
   buildRunTargetRows,
-  getEphemeralVmLabel,
   getRecipeDetail,
   RUN_TARGET_ADD_HOST_KEY,
   type EphemeralVmRecipeOption
 } from './run-target-options'
-import { AddHostSubmenuRow, RecipesSubmenuRow } from './RunTargetSubmenus'
+import { AddHostSubmenuRow } from './RunTargetSubmenus'
 import RunTargetField from './RunTargetField'
 
 type RunTargetComboboxProps = {
@@ -46,8 +46,8 @@ const ROOT_ATTRIBUTE = 'data-run-target-combobox-root'
  * "Add host" row is pinned to the popover edge so it survives every state.
  *
  * Two things the project picker doesn't have: disconnected hosts carry an
- * inline Connect action that must not select the row, and two rows open nested
- * lists (VM recipes, Add host) rather than committing.
+ * inline Connect action that must not select the row, and "Add host" opens a
+ * nested list rather than committing. VM recipes are ordinary rows.
  */
 export default function RunTargetCombobox({
   hostOptions,
@@ -61,7 +61,7 @@ export default function RunTargetCombobox({
   onConnectHost,
   onSetLocation
 }: RunTargetComboboxProps): React.JSX.Element {
-  const [submenu, setSubmenu] = useState<'recipes' | 'add-host' | null>(null)
+  const [submenu, setSubmenu] = useState<'add-host' | null>(null)
   // Track in-flight connects per host so one stalling connect never blocks the others.
   const [connectingHostIds, setConnectingHostIds] = useState<ReadonlySet<string>>(() => new Set())
 
@@ -75,7 +75,7 @@ export default function RunTargetCombobox({
   const { query, setQuery, open, setOpen, armedKey, arm, moveArm, inputRef, listId, setListNode } =
     combobox
 
-  const { rows, matchedRecipes } = useMemo(
+  const { rows } = useMemo(
     () => buildRunTargetRows({ hostOptions, recipes, query, hasAddHost }),
     [hasAddHost, hostOptions, query, recipes]
   )
@@ -150,7 +150,7 @@ export default function RunTargetCombobox({
     [close, onSetLocation]
   )
 
-  /** Commits a row, or opens its submenu when the row is a submenu row. */
+  /** Commits a row, or opens the "Add host" submenu. */
   const activate = useCallback(
     (key: string | null): void => {
       const row = rows.find((candidate) => candidate.key === key)
@@ -166,9 +166,13 @@ export default function RunTargetCombobox({
         setLocation(row.option)
         return
       }
-      setSubmenu(row.kind === 'recipes' ? 'recipes' : 'add-host')
+      if (row.kind === 'recipe') {
+        selectRecipe(row.recipe.id)
+        return
+      }
+      setSubmenu('add-host')
     },
-    [rows, selectHost, setLocation]
+    [rows, selectHost, selectRecipe, setLocation]
   )
 
   const handleKeyDown = useCallback(
@@ -210,9 +214,7 @@ export default function RunTargetCombobox({
     [close, setOpen]
   )
 
-  const fieldLabel = selectedRecipe
-    ? `${getEphemeralVmLabel()} / ${selectedRecipe.name}`
-    : (selectedHost?.label ?? '')
+  const fieldLabel = selectedRecipe ? selectedRecipe.name : (selectedHost?.label ?? '')
   const fieldDetail = selectedRecipe ? getRecipeDetail(selectedRecipe) : (selectedHost?.path ?? '')
 
   return (
@@ -348,21 +350,21 @@ export default function RunTargetCombobox({
                   />
                 )
               }
-              // Recipes submenu row.
+              // Recipe row.
               return (
-                <RecipesSubmenuRow
+                <RunTargetRow
                   key={row.key}
-                  open={submenu === 'recipes'}
-                  onOpenChange={(next) => setSubmenu(next ? 'recipes' : null)}
+                  icon={<Cloud className="size-3.5 shrink-0 text-muted-foreground" />}
+                  label={row.recipe.name}
+                  detail={getRecipeDetail(row.recipe)}
                   armed={isArmed}
+                  current={row.recipe.id === selectedRecipe?.id}
                   optionId={optionId}
-                  recipes={matchedRecipes}
-                  selectedRecipeId={selectedRecipe?.id ?? null}
                   onArm={() => {
                     arm(row.key)
-                    setSubmenu('recipes')
+                    setSubmenu(null)
                   }}
-                  onSelectRecipe={selectRecipe}
+                  onCommit={() => selectRecipe(row.recipe.id)}
                 />
               )
             })}

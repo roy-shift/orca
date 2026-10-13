@@ -827,7 +827,7 @@ describe('NewWorkspaceComposerCard folder task source mode', () => {
     expect(storeMocks.openSettingsTarget).not.toHaveBeenCalled()
   })
 
-  it('shows VM recipes inside the run target picker', () => {
+  it('lists each VM recipe as its own row in the run target picker', () => {
     const hostChanges: string[] = []
     const recipeChanges: (string | null)[] = []
     current = renderCard({
@@ -851,12 +851,8 @@ describe('NewWorkspaceComposerCard folder task source mode', () => {
 
     openRunTargetPicker(current.container)
 
-    expect(document.body.textContent).toContain('Per-Workspace Environment')
-    const ephemeralVmItem = [
-      ...document.body.querySelectorAll<HTMLElement>('[role="option"]')
-    ].find((item) => item.textContent?.includes('Per-Workspace Environment'))
-    expect(ephemeralVmItem).toBeTruthy()
-    act(() => ephemeralVmItem?.click())
+    // Each recipe is a row of its own, not behind a "Per-Workspace Environment" submenu.
+    expect(document.body.textContent).not.toContain('Per-Workspace Environment')
 
     const recipeItem = [...document.body.querySelectorAll<HTMLElement>('[role="option"]')].find(
       (item) => item.textContent?.includes('Vercel Sandbox')
@@ -890,7 +886,7 @@ describe('NewWorkspaceComposerCard folder task source mode', () => {
     const runTargetShell = current.container.querySelector<HTMLElement>(
       'div[data-run-target-combobox-root="true"]'
     )
-    expect(runTargetShell?.textContent).toContain('Per-Workspace Environment')
+    expect(runTargetShell?.textContent).toContain('Vercel Sandbox')
     openRunTargetPicker(current.container)
 
     const builderItem = [...document.body.querySelectorAll<HTMLElement>('[role="option"]')].find(

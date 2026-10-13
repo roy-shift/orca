@@ -42,11 +42,7 @@ test('adopts a recipe-provisioned SSH root without creating a linked worktree', 
     const dialog = orcaPage.getByRole('dialog', { name: /Create (Workspace|Worktree)/i })
     await expect(dialog).toBeVisible()
     await dialog.getByRole('combobox', { name: 'Run on' }).click()
-    await orcaPage.getByRole('option', { name: /Per-Workspace Environment/ }).click()
-    await orcaPage
-      .getByRole('listbox', { name: 'Per-Workspace Environment' })
-      .getByText('Docker provisioned root', { exact: true })
-      .click()
+    await orcaPage.getByRole('option', { name: /Docker provisioned root/ }).click()
 
     const workspaceName = `provisioned-root-${Date.now()}`
     await dialog.getByPlaceholder(/Type a name/i).fill(workspaceName)

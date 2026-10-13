@@ -9,13 +9,12 @@ import { translate } from '@/i18n/i18n'
 export type EphemeralVmRecipeOption = NonNullable<OrcaHooks['environmentRecipes']>[number]
 
 export const RUN_TARGET_ADD_HOST_KEY = 'add-host'
-export const RUN_TARGET_RECIPES_KEY = 'per-workspace-env'
 
-/** A row in the run-target list. Hosts commit; the last two open a submenu. */
+/** A row in the run-target list. Hosts and recipes commit; "Add host" opens a submenu. */
 export type RunTargetRowModel =
   | { key: string; kind: 'ready'; option: ReadyProjectHostSetupOption }
   | { key: string; kind: 'needs-setup'; option: NeedsSetupProjectHostOption }
-  | { key: typeof RUN_TARGET_RECIPES_KEY; kind: 'recipes' }
+  | { key: string; kind: 'recipe'; recipe: EphemeralVmRecipeOption }
   | { key: typeof RUN_TARGET_ADD_HOST_KEY; kind: 'add-host' }
 
 export function getEphemeralVmLabel(): string {
@@ -54,9 +53,9 @@ function matches(haystack: string, query: string): boolean {
 }
 
 /**
- * Filters hosts and recipes by a typed query. The submenu rows survive filtering
- * only while they still have something to show — "Add host" always survives, so
- * it stays reachable in every state including no-matches.
+ * Filters hosts and recipes by a typed query. Each recipe is its own row, listed after
+ * the hosts. "Add host" always survives filtering, so it stays reachable in every
+ * state including no-matches.
  */
 export function buildRunTargetRows({
   hostOptions,
@@ -68,7 +67,7 @@ export function buildRunTargetRows({
   recipes: readonly EphemeralVmRecipeOption[]
   query: string
   hasAddHost: boolean
-}): { rows: RunTargetRowModel[]; matchedRecipes: EphemeralVmRecipeOption[] } {
+}): { rows: RunTargetRowModel[] } {
   const trimmed = query.trim().toLowerCase()
   const hostMatches = (option: ProjectHostSetupOption): boolean =>
     trimmed === '' ||
@@ -100,11 +99,15 @@ export function buildRunTargetRows({
       option
     }))
   ]
-  if (matchedRecipes.length > 0) {
-    rows.push({ key: RUN_TARGET_RECIPES_KEY, kind: 'recipes' })
-  }
+  rows.push(
+    ...matchedRecipes.map((recipe) => ({
+      key: `recipe:${recipe.id}`,
+      kind: 'recipe' as const,
+      recipe
+    }))
+  )
   if (hasAddHost) {
     rows.push({ key: RUN_TARGET_ADD_HOST_KEY, kind: 'add-host' })
   }
-  return { rows, matchedRecipes }
+  return { rows }
 }
