@@ -65,7 +65,13 @@ orca-shift worktree create --repo id:<repoId> --name my-feature --recipe <recipe
   firewall) after each update.
 - **Server platforms.** The bundled managed server covers Linux arm64 only, which is what Docker on Apple
   Silicon runs. Other remote hosts, such as x64 Linux, are not covered.
-- **Orca Mobile.** Local-network pairing works only if your network lets the phone reach the Mac (office
+- **Orca Mobile does not show recipe VM workspaces.** A phone paired with Orca Shift lists only the workspaces
+  that live on the Mac itself. Workspaces that run in a recipe VM (a Docker or dev container) do not appear on
+  the phone and cannot be opened from it; use the desktop app for those. The phone reads the desktop's own
+  runtime, while a VM workspace lives on the VM's own server. Upstream has groundwork for the desktop to list
+  other servers for phones, but it is not enabled yet and the mobile app does not ask for it, so a fork cannot
+  fix this alone.
+- **Orca Mobile pairing.** Local-network pairing works only if your network lets the phone reach the Mac (office
   Wi-Fi often blocks it). "Anywhere" pairing needs an Orca account sign-in, which is tied to upstream's app.
 - **Updates.** There is no automatic update. Install new releases yourself.
 
