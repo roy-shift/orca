@@ -25,6 +25,13 @@ if [ -f "$CONTENTS/Info.plist" ]; then
 	EXECUTABLE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$CONTENTS/Info.plist" 2>/dev/null || echo Orca)"
 fi
 ELECTRON="$CONTENTS/MacOS/$EXECUTABLE"
+# Why: a renamed build keeps its data under its own name, so the CLI must look there, not at Orca's.
+if [ -z "${ORCA_USER_DATA_PATH:-}" ] && [ -f "$CONTENTS/Info.plist" ]; then
+	BUNDLE_NAME="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleName' "$CONTENTS/Info.plist" 2>/dev/null || true)"
+	if [ -n "$BUNDLE_NAME" ] && [ "$BUNDLE_NAME" != "Orca" ]; then
+		export ORCA_USER_DATA_PATH="$HOME/Library/Application Support/$BUNDLE_NAME"
+	fi
+fi
 # Why: Orca packages the CLI entrypoint outside app.asar so the public shell
 # command can execute it directly with ELECTRON_RUN_AS_NODE, mirroring VS Code's
 # launcher model instead of requiring a separate npm-distributed binary.

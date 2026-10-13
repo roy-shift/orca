@@ -335,6 +335,94 @@ printf 'arg=%s\\n' "$@"
     }
   )
 
+  it.skipIf(process.platform !== 'darwin')(
+    'points a renamed app at its own data folder unless the caller chose one',
+    async () => {
+      const root = await mkdtemp(join(tmpdir(), 'orca-renamed-data-'))
+      try {
+        const contents = join(root, 'Orca Shift.app', 'Contents')
+        const launcherPath = join(contents, 'Resources', 'bin', 'orca')
+        const electronPath = join(contents, 'MacOS', 'Orca Shift')
+        const cliPath = join(contents, 'Resources', 'app.asar.unpacked', 'out', 'cli', 'index.js')
+        await mkdir(dirname(launcherPath), { recursive: true })
+        await mkdir(dirname(electronPath), { recursive: true })
+        await mkdir(dirname(cliPath), { recursive: true })
+        await copyFile(darwinLauncherAsset, launcherPath)
+        await writeFile(cliPath, '', 'utf8')
+        await writeFile(
+          join(contents, 'Info.plist'),
+          `<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict><key>CFBundleExecutable</key><string>Orca Shift</string><key>CFBundleName</key><string>Orca Shift</string></dict></plist>
+`,
+          'utf8'
+        )
+        await writeFile(
+          electronPath,
+          '#!/usr/bin/env bash\necho "data=${ORCA_USER_DATA_PATH-unset}"\n',
+          {
+            encoding: 'utf8',
+            mode: 0o755
+          }
+        )
+        const baseEnv: NodeJS.ProcessEnv = { ...process.env, HOME: '/Users/someone' }
+        delete baseEnv.ORCA_USER_DATA_PATH
+
+        const defaulted = await execFileAsync(launcherPath, [], { env: baseEnv })
+        const chosen = await execFileAsync(launcherPath, [], {
+          env: { ...baseEnv, ORCA_USER_DATA_PATH: '/custom/path' }
+        })
+
+        expect(defaulted.stdout.trim()).toBe(
+          'data=/Users/someone/Library/Application Support/Orca Shift'
+        )
+        expect(chosen.stdout.trim()).toBe('data=/custom/path')
+      } finally {
+        await rm(root, { recursive: true, force: true })
+      }
+    }
+  )
+
+  it.skipIf(process.platform !== 'darwin')(
+    'leaves upstream Orca on its default data folder',
+    async () => {
+      const root = await mkdtemp(join(tmpdir(), 'orca-upstream-data-'))
+      try {
+        const contents = join(root, 'Orca.app', 'Contents')
+        const launcherPath = join(contents, 'Resources', 'bin', 'orca')
+        const electronPath = join(contents, 'MacOS', 'Orca')
+        const cliPath = join(contents, 'Resources', 'app.asar.unpacked', 'out', 'cli', 'index.js')
+        await mkdir(dirname(launcherPath), { recursive: true })
+        await mkdir(dirname(electronPath), { recursive: true })
+        await mkdir(dirname(cliPath), { recursive: true })
+        await copyFile(darwinLauncherAsset, launcherPath)
+        await writeFile(cliPath, '', 'utf8')
+        await writeFile(
+          join(contents, 'Info.plist'),
+          `<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict><key>CFBundleExecutable</key><string>Orca</string><key>CFBundleName</key><string>Orca</string></dict></plist>
+`,
+          'utf8'
+        )
+        await writeFile(
+          electronPath,
+          '#!/usr/bin/env bash\necho "data=${ORCA_USER_DATA_PATH-unset}"\n',
+          {
+            encoding: 'utf8',
+            mode: 0o755
+          }
+        )
+        const env = { ...process.env }
+        delete env.ORCA_USER_DATA_PATH
+
+        const result = await execFileAsync(launcherPath, [], { env })
+
+        expect(result.stdout.trim()).toBe('data=unset')
+      } finally {
+        await rm(root, { recursive: true, force: true })
+      }
+    }
+  )
+
   // Observe each launcher's actual child env and argv, including arguments with spaces.
   itRunsUnixShell.each(unixLauncherFixtures)(
     'sanitizes node env and forwards argv verbatim through the $name launcher',
