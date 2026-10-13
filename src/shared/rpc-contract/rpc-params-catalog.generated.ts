@@ -586,6 +586,7 @@ import {
   WorktreeTeardownMissingTerminalsParams
 } from './worktree-params'
 import { WorktreeAdoptProvisionedRoot } from './worktree-provisioned-root-params'
+import { WorktreeCreateFromRecipe } from './worktree-recipe-create-params'
 import { SkillBundleInstallRequestSchema } from '../skill-bundle-install-contract'
 import { SkillDeleteRequestSchema } from '../skill-delete-contract'
 import {
@@ -1282,6 +1283,7 @@ export const RPC_PARAMS_BY_METHOD = {
   'worktree.activate': WorktreeActivate,
   'worktree.adoptProvisionedRoot': WorktreeAdoptProvisionedRoot,
   'worktree.create': WorktreeCreate,
+  'worktree.createFromRecipe': WorktreeCreateFromRecipe,
   'worktree.detectedList': WorktreeDetectedListParams,
   'worktree.forceDeleteBranch': WorktreeForceDeleteBranch,
   'worktree.lineageList': null,

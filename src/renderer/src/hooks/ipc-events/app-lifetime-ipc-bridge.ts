@@ -19,6 +19,7 @@ import { registerOsMarkdownFileOpenBridge } from './os-markdown-file-open-bridge
 import { registerProjectCatalogIpcBridge } from './project-catalog-ipc-bridge'
 import { registerRateLimitIpcBridge } from './rate-limit-ipc-bridge'
 import { registerRuntimeClientIpcBridge } from './runtime-client-ipc-bridge'
+import { registerRecipeWorktreeCreateIpcBridge } from './recipe-worktree-create-ipc-bridge'
 import { registerSessionTabIpcBridge } from './session-tab-ipc-bridge'
 import { registerSettingsAndSidebarIpcBridge } from './settings-sidebar-ipc-bridge'
 import { registerTabLifecycleIpcBridge } from './tab-lifecycle-ipc-bridge'
@@ -119,6 +120,7 @@ export function installAppLifetimeIpcEvents(
   registerPtySourceDisownedIpcBridge(unsubs)
   registerTerminalUiRoutingIpcBridge(unsubs)
   registerSessionTabIpcBridge(unsubs)
+  registerRecipeWorktreeCreateIpcBridge(unsubs)
   registerMobileAndTerminalCloseIpcBridge(unsubs, backgroundWakeDispatcher.request)
   registerUpdaterStatusIpcBridge(unsubs)
   registerBrowserStateIpcBridge(unsubs, isRuntimeEnvironmentActive)

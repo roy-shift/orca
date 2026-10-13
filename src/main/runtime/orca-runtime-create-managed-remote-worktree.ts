@@ -15,6 +15,10 @@ import { resolveRuntimeGitHubWorktreeBase } from './runtime-github-worktree-base
 import { resolveRuntimeGitLabWorktreeBase } from './runtime-gitlab-worktree-base'
 import { listWorktreesStrict } from '../git/worktree-listing'
 import {
+  createRuntimeWorktreeFromRecipe,
+  type RuntimeRecipeWorktreeCreateParams
+} from './runtime-recipe-worktree-create'
+import {
   adoptRuntimeProvisionedRoot,
   readLocalSparseCheckoutEnabled,
   type RuntimeProvisionedRootRequest
@@ -162,6 +166,15 @@ export class OrcaRuntimeWithCreateManagedRemoteWorktree extends OrcaRuntimeWithC
       },
       notifyChanged: (repoId) => this.notifyWorktreesChanged(repoId),
       showWorktree: (selector) => this.showManagedWorktree(selector)
+    })
+  }
+
+  createManagedWorktreeFromRecipe(params: RuntimeRecipeWorktreeCreateParams) {
+    return createRuntimeWorktreeFromRecipe(params, {
+      resolveRepo: (selector) => this.resolveRepoSelector(selector),
+      requestRendererCreate: this.notifier?.requestRecipeWorktreeCreate
+        ? (request) => this.notifier!.requestRecipeWorktreeCreate!(request)
+        : undefined
     })
   }
 

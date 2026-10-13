@@ -26,6 +26,7 @@ import {
 import type { TuiAgent } from '../../shared/tui-agent'
 import { parseCliAgent, readCliAgentLaunch } from '../agent-launch-request'
 import { createWorktreeWithAgent } from './worktree-create-agent-launch'
+import { assertRecipeCreateFlags, createWorktreeFromRecipe } from './worktree-create-from-recipe'
 import { printLineageSummary } from './worktree-lineage-summary'
 import { projectWorktreePsTerminalVerdict } from '../worktree-ps-terminal-verdict'
 import {
@@ -162,6 +163,7 @@ export const WORKTREE_HANDLERS: Record<string, CommandHandler> = {
     printResult(result, json, formatWorktreeShow)
   },
   'worktree create': async ({ flags, client, cwd, json, rawArgs }) => {
+    assertRecipeCreateFlags(flags)
     const linkedItems = getCreateReferences(flags)
     assertWorktreeParentFlagsCompatible(flags)
     assertWorkspaceTargetFlagsCompatible(flags)
@@ -204,6 +206,9 @@ export const WORKTREE_HANDLERS: Record<string, CommandHandler> = {
     const activate = flags.get('activate') === true || flags.get('run-hooks') === true
     const name = getRequiredStringFlag(flags, 'name')
     const repo = await getCreateRepoSelector(flags, cwdParentWorktree, client)
+    if (await createWorktreeFromRecipe({ flags, client, json, repo })) {
+      return
+    }
     await assertGitLabLinkFlagProjectsMatch(flags, client, { repo })
     if (linkedItems) {
       await assertReferenceWritesSupported(client)

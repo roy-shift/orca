@@ -42,9 +42,11 @@ function startWorktreeCreation(creationId: string, request: WorktreeCreationRequ
 function revealPendingCreation(
   creationId: string,
   request: WorktreeCreationRequest,
-  phase: WorktreeCreationPhase
+  phase: WorktreeCreationPhase,
+  reveal = true
 ): void {
   const store = useAppStore.getState()
+  const previousActiveCreationId = store.activePendingCreationId
   const indeterminate = getWorktreeCreationIndeterminate(request)
   store.beginPendingWorktreeCreation({
     creationId,
@@ -57,6 +59,11 @@ function revealPendingCreation(
     loaderVisible: true,
     request
   })
+  if (!reveal) {
+    // Why: a CLI-started create must not pull the user off the workspace they are in.
+    store.setActivePendingWorktreeCreation(previousActiveCreationId)
+    return
+  }
   // Why: the creation panel only renders under the terminal view (App content
   // router), so force it active so the panel is what fills the content area.
   store.setActiveView('terminal')
@@ -64,7 +71,10 @@ function revealPendingCreation(
 }
 
 /** Start creation without blocking the composer; the pending panel owns preparation and errors. */
-export function runBackgroundWorktreeCreation(request: WorktreeCreationRequest): string {
+export function runBackgroundWorktreeCreation(
+  request: WorktreeCreationRequest,
+  options: { reveal?: boolean } = {}
+): string {
   const store = useAppStore.getState()
   const existingCreationId = findPendingLinkedWorkItemCreationId(
     store.pendingWorktreeCreations,
@@ -79,7 +89,12 @@ export function runBackgroundWorktreeCreation(request: WorktreeCreationRequest):
   // Why: crypto.randomUUID is undefined in non-secure browser contexts (LAN web
   // client over plain HTTP). createBrowserUuid falls back to getRandomValues.
   const creationId = createBrowserUuid()
-  revealPendingCreation(creationId, request, getInitialWorktreeCreationPhase(request))
+  revealPendingCreation(
+    creationId,
+    request,
+    getInitialWorktreeCreationPhase(request),
+    options.reveal !== false
+  )
   startWorktreeCreation(creationId, request)
   return creationId
 }

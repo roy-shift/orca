@@ -31,6 +31,7 @@ import {
 } from '../../../../shared/rpc-contract/worktree-params'
 import { WORKTREE_CATALOG_METHODS } from './worktree-catalog-methods'
 import { WORKTREE_PROVISIONED_ROOT_METHOD } from './worktree-provisioned-root-method'
+import { WORKTREE_CREATE_FROM_RECIPE_METHOD } from './worktree-recipe-create-method'
 import { readsWorktreeRemovalMarker } from '../worktree-removal-marker-projection'
 
 export const WORKTREE_METHODS = [
@@ -138,6 +139,7 @@ export const WORKTREE_METHODS = [
       })
   }),
   WORKTREE_PROVISIONED_ROOT_METHOD,
+  WORKTREE_CREATE_FROM_RECIPE_METHOD,
   defineMethod({
     name: 'worktree.prefetchCreateBase',
     permission: 'workspace',

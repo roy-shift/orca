@@ -5,6 +5,7 @@ export const FLAG_HELP_TEXT: Record<string, string> = {
   agent: '--agent <id>          Launch a known TUI agent in the first terminal',
   'base-branch': '--base-branch <ref>    Base branch/ref to create the worktree from',
   command: '--command <text>       Command to run in the terminal on startup',
+  recipe: '--recipe <id>          Create on a per-workspace environment from orca.yaml',
   comment: '--comment <text>       Comment stored in Orca metadata',
   cursor: '--cursor <n>           Line cursor from a previous read (returns only new output)',
   action: '--action <name>       Secondary accessibility action name',

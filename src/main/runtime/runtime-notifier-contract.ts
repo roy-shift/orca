@@ -8,6 +8,10 @@ import type {
 import type { TerminalPaneSplitSource } from '../../shared/feature-education-telemetry'
 import type { TerminalRevealIdentity } from '../../shared/terminal-reveal-identity'
 import type { TuiAgent } from '../../shared/tui-agent'
+import type {
+  RecipeWorktreeCreateRequest,
+  RecipeWorktreeCreateResponse
+} from '../../shared/recipe-worktree-create'
 import type { RuntimeNavigationTarget } from '../../shared/runtime-navigation'
 import type { ClientHostedBrowserRowsEvent } from '../../shared/client-hosted-browser-rows'
 import type {
@@ -116,6 +120,10 @@ export type RuntimeNotifier = {
   focusTerminal(tabId: string, worktreeId: string, leafId?: string | null): void
   focusEditorTab?(tabId: string, worktreeId: string): void
   closeSessionTab?(tabId: string, worktreeId: string): void | Promise<void>
+  /** Asks the desktop window to run a recipe workspace creation and report the created workspace. */
+  requestRecipeWorktreeCreate?(
+    request: Omit<RecipeWorktreeCreateRequest, 'requestId'>
+  ): Promise<RecipeWorktreeCreateResponse>
   moveSessionTab?(worktreeId: string, move: RuntimeMobileSessionTabMove): void
   /**
    * Acts only on the host's own window: 'host'/'all' move it, 'caller'/'clients' open without moving

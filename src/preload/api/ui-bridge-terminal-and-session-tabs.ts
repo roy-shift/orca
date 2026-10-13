@@ -215,6 +215,15 @@ export const uiTerminalAndSessionTabsApi = {
   respondSessionTabClose: (response) => {
     ipcRenderer.send('ui:sessionTabCloseResponse', response)
   },
+  onRecipeWorktreeCreateRequest: (callback) => {
+    const listener = (_event: Electron.IpcRendererEvent, request: Parameters<typeof callback>[0]) =>
+      callback(request)
+    ipcRenderer.on('ui:recipeWorktreeCreateRequest', listener)
+    return () => ipcRenderer.removeListener('ui:recipeWorktreeCreateRequest', listener)
+  },
+  respondRecipeWorktreeCreate: (response) => {
+    ipcRenderer.send('ui:recipeWorktreeCreateResponse', response)
+  },
   onMoveSessionTab: (
     callback: (data: { worktreeId: string } & RuntimeMobileSessionTabMove) => void
   ): (() => void) => {

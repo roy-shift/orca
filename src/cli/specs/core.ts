@@ -67,10 +67,11 @@ export const CORE_COMMAND_SPECS: CommandSpec[] = [
     repeatableFlags: ['reference'],
     summary: 'Create a new Orca-managed worktree',
     usage:
-      'orca worktree create --name <name> [--repo <selector>|--project <id> [--host <host-id>]|--project-host-setup <id>] [--agent <id>] [--prompt <text>] [--model <id>] [--effort <level>] [--setup run|skip|inherit] [--base-branch <ref>] [--reference <url>...] [--issue <number>] [--pr <number>] [--linear-issue <identifier-or-url>] [--gitlab-issue <number-or-url>] [--gitlab-mr <number-or-url>] [--comment <text>] [--parent-worktree <selector>] [--no-parent] [--run-hooks] [--activate] [--retry-launch <operationId>] [--json]',
+      'orca worktree create --name <name> [--repo <selector>|--project <id> [--host <host-id>]|--project-host-setup <id>] [--agent <id>] [--prompt <text>] [--model <id>] [--effort <level>] [--setup run|skip|inherit] [--base-branch <ref>] [--reference <url>...] [--issue <number>] [--pr <number>] [--linear-issue <identifier-or-url>] [--gitlab-issue <number-or-url>] [--gitlab-mr <number-or-url>] [--comment <text>] [--parent-worktree <selector>] [--no-parent] [--run-hooks] [--activate] [--retry-launch <operationId>] [--recipe <id>] [--json]',
     allowedFlags: [
       ...GLOBAL_FLAGS,
       'repo',
+      'recipe',
       'project',
       'host',
       'project-host-setup',
@@ -111,9 +112,11 @@ export const CORE_COMMAND_SPECS: CommandSpec[] = [
       'Repo-defined setup hooks follow the repository setup policy; pass --setup run to force them.',
       'Pass --activate when the CLI caller intentionally wants to reveal the new worktree in the app.',
       'Passing --run-hooks is kept as a legacy alias for --setup run and reveals the worktree.',
-      'Use --pr for GitHub pull requests; --gitlab-issue and --gitlab-mr write separate GitLab links. GitLab URLs must match the stored source project or remote; they cannot select a foreign project.'
+      'Use --pr for GitHub pull requests; --gitlab-issue and --gitlab-mr write separate GitLab links. GitLab URLs must match the stored source project or remote; they cannot select a foreign project.',
+      "Pass --recipe <id> to run an `environmentRecipes` entry from the project's orca.yaml and create the workspace on that disposable environment, as the New Workspace dialog does. The desktop app runs it, so it must be open with Cloud VM enabled in Settings → Experimental, and a recipe the app has not trusted yet asks for confirmation there. Combine it only with --repo, --name, and --base-branch."
     ],
     examples: [
+      'orca worktree create --repo id:<repoId> --name feature-x --recipe local-docker-ssh --json',
       'orca worktree create --name agent-task --agent codex --prompt "hi" --json',
       'orca worktree create --name design --no-parent --agent codex --model gpt-6-astra --effort high --prompt "Write the design doc" --json',
       'orca worktree create --repo id:<repoId> --name related-task --json',

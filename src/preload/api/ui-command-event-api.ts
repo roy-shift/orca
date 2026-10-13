@@ -45,6 +45,10 @@ import type {
   SessionTabCloseRequest,
   SessionTabCloseResponse
 } from '../../shared/session-tab-close'
+import type {
+  RecipeWorktreeCreateRequest,
+  RecipeWorktreeCreateResponse
+} from '../../shared/recipe-worktree-create'
 
 export type CloseActiveTabPayload = { sourceId: string }
 
@@ -226,6 +230,10 @@ export type UiCommandEventApi = {
   onCloseSessionTab: (callback: (data: { tabId: string; worktreeId: string }) => void) => () => void
   onSessionTabCloseRequest: (callback: (request: SessionTabCloseRequest) => void) => () => void
   respondSessionTabClose: (response: SessionTabCloseResponse) => void
+  onRecipeWorktreeCreateRequest: (
+    callback: (request: RecipeWorktreeCreateRequest) => void
+  ) => () => void
+  respondRecipeWorktreeCreate: (response: RecipeWorktreeCreateResponse) => void
   onMoveSessionTab: (
     callback: (data: { worktreeId: string } & RuntimeMobileSessionTabMove) => void
   ) => () => void

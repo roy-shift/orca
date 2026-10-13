@@ -16,6 +16,7 @@ import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import { requestMobileMarkdownFromRenderer } from './mobile-markdown-request-relay'
 import { registerRendererDocumentNavigation } from './renderer-document-navigation'
 import { createRuntimeRendererNotificationSender } from './runtime-renderer-notification-sender'
+import { requestRecipeWorktreeCreateFromRenderer } from './recipe-worktree-create-request-relay'
 import { requestSessionTabCloseFromRenderer } from './session-tab-close-request-relay'
 import { requestTerminalTabCloseFromRenderer } from './terminal-tab-close-request-relay'
 
@@ -175,6 +176,8 @@ export function registerRuntimeWindowLifecycle(
     focusEditorTab: (tabId, worktreeId) => send('ui:focusEditorTab', { tabId, worktreeId }),
     closeSessionTab: (tabId, worktreeId) =>
       requestSessionTabCloseFromRenderer(mainWindow, tabId, worktreeId),
+    requestRecipeWorktreeCreate: (request) =>
+      requestRecipeWorktreeCreateFromRenderer(mainWindow, request),
     moveSessionTab: (worktreeId: string, move: RuntimeMobileSessionTabMove) =>
       send('ui:moveSessionTab', { worktreeId, ...move }),
     openFile: (worktreeId, filePath, relativePath, runtimeEnvironmentId?, navigation?) =>

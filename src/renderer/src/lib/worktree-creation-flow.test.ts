@@ -185,6 +185,25 @@ describe('runBackgroundWorktreeCreation', () => {
     )
   })
 
+  it('keeps the user on their current view and surface when asked not to reveal', () => {
+    store.activePendingCreationId = 'already-active'
+    store.setActivePendingWorktreeCreation.mockClear()
+
+    runBackgroundWorktreeCreation(makeRequest(), { reveal: false })
+
+    expect(store.beginPendingWorktreeCreation).toHaveBeenCalled()
+    expect(store.setActiveView).not.toHaveBeenCalled()
+    expect(store.setSidebarOpen).not.toHaveBeenCalled()
+    expect(store.setActivePendingWorktreeCreation).toHaveBeenCalledWith('already-active')
+  })
+
+  it('reveals the creation surface by default', () => {
+    runBackgroundWorktreeCreation(makeRequest())
+
+    expect(store.setActiveView).toHaveBeenCalledWith('terminal')
+    expect(store.setSidebarOpen).toHaveBeenCalledWith(true)
+  })
+
   it('falls back to focused runtime state for legacy captured requests', () => {
     store.settings.activeRuntimeEnvironmentId = 'focused-runtime'
     store.beginPendingWorktreeCreation.mockClear()
