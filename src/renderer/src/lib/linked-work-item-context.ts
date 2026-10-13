@@ -187,7 +187,9 @@ export function resolveQuickCreateLinkedWorkItemPrompt(
       > & { linkedContext?: LinkedWorkItemContext })
     | null
     | undefined,
-  note: string
+  note: string,
+  // Why: a draft waits for the user to press Enter; autoRun hands the same text to the agent as its prompt.
+  options?: { autoRun?: boolean }
 ): { prompt: string; draftPrompt: string | null } {
   const trimmedNote = note.trim()
   const linearBlock = isLinearWorkItemReference(linkedWorkItem)
@@ -206,6 +208,9 @@ export function resolveQuickCreateLinkedWorkItemPrompt(
       ? [trimmedNote, linkedUrl].filter(Boolean).join('\n\n')
       : null
   const isLinearTypedOnly = linkedWorkItem?.number === 0 && Boolean(trimmedNote) && !draftPrompt
+  if (options?.autoRun && draftPrompt) {
+    return { prompt: draftPrompt.trim(), draftPrompt: null }
+  }
   return {
     prompt: isLinearTypedOnly ? trimmedNote : '',
     draftPrompt

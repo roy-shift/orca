@@ -8900,7 +8900,10 @@
           "integrationsHint": "Credentials for all providers also live under",
           "integrationsLink": "Integrations",
           "skillHint": ". After Linear is connected, usage examples stay under Settings → Linear.",
-          "incompleteBannerBodyWithLinear": "Hide providers you do not use, or expand a card and finish its steps. For Linear: API access, the agent skill, and Show in Tasks."
+          "incompleteBannerBodyWithLinear": "Hide providers you do not use, or expand a card and finish its steps. For Linear: API access, the agent skill, and Show in Tasks.",
+          "autoRunTitle": "Run picked tasks automatically",
+          "autoRunDescription": "When you start a workspace from a task, the agent begins on its link right away. Off leaves the link in the agent input for you to review and send.",
+          "autoRunToggleLabel": "Toggle running picked tasks automatically"
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "Thickness of the pane divider line.",
@@ -10799,7 +10802,14 @@
             "setup": "setup",
             "apiKey": "api key",
             "skill": "skill",
-            "connect": "connect"
+            "connect": "connect",
+            "autoRunTitle": "Run picked tasks automatically",
+            "autoRunDescription": "Start the agent on the task link instead of leaving it as a draft.",
+            "autoRun": "auto run",
+            "agent": "agent",
+            "prompt": "prompt",
+            "draft": "draft",
+            "jira": "jira"
           }
         },
         "terminal": {

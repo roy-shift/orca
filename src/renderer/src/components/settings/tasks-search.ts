@@ -20,6 +20,14 @@ export const getTasksPaneSearchKeywords = createLocalizedCatalog(() => [
   ...translateSearchKeyword('auto.components.settings.tasks.search.connect', 'connect')
 ])
 
+export const getTasksPaneAutoRunSearchKeywords = createLocalizedCatalog(() => [
+  ...translateSearchKeyword('auto.components.settings.tasks.search.autoRun', 'auto run'),
+  ...translateSearchKeyword('auto.components.settings.tasks.search.agent', 'agent'),
+  ...translateSearchKeyword('auto.components.settings.tasks.search.prompt', 'prompt'),
+  ...translateSearchKeyword('auto.components.settings.tasks.search.draft', 'draft'),
+  ...translateSearchKeyword('auto.components.settings.tasks.search.jira', 'jira')
+])
+
 export const getTasksPaneSearchEntries = createLocalizedCatalog(() => [
   {
     title: translate('auto.components.settings.tasks.search.5b8e4aace5', 'Task Providers'),
@@ -28,5 +36,16 @@ export const getTasksPaneSearchEntries = createLocalizedCatalog(() => [
       'Connect task providers, install the Linear agent skill, and choose what appears in Tasks.'
     ),
     keywords: getTasksPaneSearchKeywords()
+  },
+  {
+    title: translate(
+      'auto.components.settings.tasks.search.autoRunTitle',
+      'Run picked tasks automatically'
+    ),
+    description: translate(
+      'auto.components.settings.tasks.search.autoRunDescription',
+      'Start the agent on the task link instead of leaving it as a draft.'
+    ),
+    keywords: getTasksPaneAutoRunSearchKeywords()
   }
 ])

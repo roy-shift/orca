@@ -8569,7 +8569,10 @@
           "integrationsHint": "모든 제공업체의 자격 증명은 다음에서도 관리할 수 있습니다:",
           "integrationsLink": "연동",
           "skillHint": ". Linear를 연결한 후 사용 예시는 설정 → Linear에서 확인할 수 있습니다.",
-          "incompleteBannerBodyWithLinear": "사용하지 않는 제공업체를 숨기거나 카드를 펼쳐 단계를 완료하세요. Linear에는 API 액세스, 에이전트 스킬, 작업에 표시가 필요합니다."
+          "incompleteBannerBodyWithLinear": "사용하지 않는 제공업체를 숨기거나 카드를 펼쳐 단계를 완료하세요. Linear에는 API 액세스, 에이전트 스킬, 작업에 표시가 필요합니다.",
+          "autoRunTitle": "선택한 작업 자동 실행",
+          "autoRunDescription": "작업에서 워크스페이스를 시작하면 에이전트가 해당 링크로 바로 작업을 시작합니다. 끄면 링크가 에이전트 입력란에 남아 검토 후 직접 보낼 수 있습니다.",
+          "autoRunToggleLabel": "선택한 작업 자동 실행 전환"
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "창 구분선의 두께입니다.",
@@ -10466,7 +10469,9 @@
             "setup": "설정",
             "apiKey": "API 키",
             "skill": "스킬",
-            "connect": "연결"
+            "connect": "연결",
+            "autoRunTitle": "선택한 작업 자동 실행",
+            "autoRunDescription": "작업 링크를 초안으로 남기지 않고 에이전트를 해당 링크로 시작합니다."
           }
         },
         "terminal": {

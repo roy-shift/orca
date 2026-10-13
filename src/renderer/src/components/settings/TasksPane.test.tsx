@@ -253,6 +253,42 @@ describe('TasksPane', () => {
     })
   })
 
+  it('turns running picked tasks automatically on and off', async () => {
+    for (const [enabled, expected] of [
+      [false, true],
+      [true, false]
+    ] as const) {
+      const updateSettings = vi.fn()
+      container = document.createElement('div')
+      document.body.appendChild(container)
+      root = createRoot(container)
+      await act(async () => {
+        root?.render(
+          <TasksPane
+            settings={{ ...baseSettings, autoRunLinkedTaskPrompt: enabled }}
+            updateSettings={updateSettings}
+          />
+        )
+      })
+      const toggle = container.querySelector<HTMLElement>(
+        '[aria-label="Toggle running picked tasks automatically"]'
+      )
+      expect(toggle?.getAttribute('aria-checked')).toBe(String(enabled))
+
+      await act(async () => {
+        toggle?.click()
+      })
+
+      expect(updateSettings).toHaveBeenCalledWith({ autoRunLinkedTaskPrompt: expected })
+      await act(async () => {
+        root?.unmount()
+      })
+      container.remove()
+      root = null
+      container = null
+    }
+  })
+
   it('auto-expands only the first incomplete provider', () => {
     mocks.readiness.gitlab = { connected: false, checking: false, visible: true }
 

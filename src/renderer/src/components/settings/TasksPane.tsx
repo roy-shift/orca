@@ -10,9 +10,10 @@ import {
 import { JiraIcon } from '@/components/icons/JiraIcon'
 import { LinearIcon } from '@/components/icons/LinearIcon'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { useAppStore } from '@/store'
 import { SearchableSetting } from './SearchableSetting'
-import { SettingsSubsectionHeader } from './SettingsFormControls'
+import { SettingsSubsectionHeader, SettingsSwitch } from './SettingsFormControls'
 import { CodeHostSetupSteps, JiraSetupSteps } from './TaskSourceSimpleSetup'
 import { TaskSourceLinearSetup } from './TaskSourceLinearSetup'
 import { TaskSourceProviderCard } from './TaskSourceProviderCard'
@@ -24,7 +25,7 @@ import {
   JIRA_INTEGRATION_SECTION_ID,
   LINEAR_INTEGRATION_SECTION_ID
 } from './task-provider-integration-section-ids'
-import { getTasksPaneSearchKeywords } from './tasks-search'
+import { getTasksPaneAutoRunSearchKeywords, getTasksPaneSearchKeywords } from './tasks-search'
 import { useIntegrationProviderStatusRefresh } from './use-integration-provider-status-refresh'
 import { useTaskSourceProviderReadiness } from './use-task-source-provider-readiness'
 import { translate } from '@/i18n/i18n'
@@ -243,6 +244,48 @@ export function TasksPane({ settings, updateSettings }: TasksPaneProps): React.J
               </TaskSourceProviderCard>
             )
           })}
+        </SearchableSetting>
+
+        <SearchableSetting
+          title={translate(
+            'auto.components.settings.tasks.search.autoRunTitle',
+            'Run picked tasks automatically'
+          )}
+          description={translate(
+            'auto.components.settings.tasks.search.autoRunDescription',
+            'Start the agent on the task link instead of leaving it as a draft.'
+          )}
+          keywords={getTasksPaneAutoRunSearchKeywords()}
+          className="max-w-none py-2"
+        >
+          <div className="flex max-w-3xl items-start justify-between gap-4">
+            <div className="min-w-0 shrink space-y-0.5">
+              <Label>
+                {translate(
+                  'auto.components.settings.TasksPane.autoRunTitle',
+                  'Run picked tasks automatically'
+                )}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {translate(
+                  'auto.components.settings.TasksPane.autoRunDescription',
+                  'When you start a workspace from a task, the agent begins on its link right away. Off leaves the link in the agent input for you to review and send.'
+                )}
+              </p>
+            </div>
+            <SettingsSwitch
+              checked={settings.autoRunLinkedTaskPrompt === true}
+              ariaLabel={translate(
+                'auto.components.settings.TasksPane.autoRunToggleLabel',
+                'Toggle running picked tasks automatically'
+              )}
+              onChange={() =>
+                updateSettings({
+                  autoRunLinkedTaskPrompt: settings.autoRunLinkedTaskPrompt !== true
+                })
+              }
+            />
+          </div>
         </SearchableSetting>
 
         <p className="text-xs text-muted-foreground">

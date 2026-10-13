@@ -41,6 +41,7 @@ import {
   type AgentSessionLaunchPlan
 } from '@/lib/agent-session-launch-plan'
 import { newAgentLaunchRequestId } from '@/lib/agent-launch-request-id'
+import { resolveDirectWorkItemPromptDelivery } from '@/lib/launch-work-item-direct-prompt-delivery'
 
 /**
  * "Use" flow: create the workspace, activate it, launch the default agent,
@@ -74,7 +75,7 @@ export async function launchWorkItemDirect(args: LaunchWorkItemDirectArgs): Prom
   const { repo, executionHostId: repoOwnerHostId, target: repoOwnerTarget } = owner
 
   const settings = store.settings
-  const promptDelivery = args.promptDelivery ?? 'draft'
+  const promptDelivery = resolveDirectWorkItemPromptDelivery(args.promptDelivery, settings)
   const repoConnectionId = repo.connectionId?.trim() || null
   const githubIdentity =
     item.number !== null && (item.type === 'issue' || item.type === 'pr')

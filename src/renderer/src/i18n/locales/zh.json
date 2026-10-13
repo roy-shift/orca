@@ -8569,7 +8569,10 @@
           "integrationsHint": "所有提供商的凭据也可在此管理：",
           "integrationsLink": "集成",
           "skillHint": "。连接 Linear 后，可在设置 → Linear 中查看使用示例。",
-          "incompleteBannerBodyWithLinear": "隐藏不使用的提供商，或展开卡片并完成其中的步骤。Linear 需要 API 访问权限、智能体技能以及在任务中显示。"
+          "incompleteBannerBodyWithLinear": "隐藏不使用的提供商，或展开卡片并完成其中的步骤。Linear 需要 API 访问权限、智能体技能以及在任务中显示。",
+          "autoRunTitle": "自动运行所选任务",
+          "autoRunDescription": "从任务启动工作区时，智能体会立即基于其链接开始工作。关闭后，链接会留在智能体输入框中，供你检查后再发送。",
+          "autoRunToggleLabel": "切换自动运行所选任务"
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "窗格分隔线的厚度。",
@@ -10466,7 +10469,9 @@
             "setup": "设置",
             "apiKey": "API 密钥",
             "skill": "技能",
-            "connect": "连接"
+            "connect": "连接",
+            "autoRunTitle": "自动运行所选任务",
+            "autoRunDescription": "用任务链接直接启动智能体，而不是留作草稿。"
           }
         },
         "terminal": {

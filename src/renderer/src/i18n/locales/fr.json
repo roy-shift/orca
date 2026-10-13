@@ -8728,7 +8728,10 @@
           "integrationsHint": "Les identifiants de tous les fournisseurs se trouvent aussi sous",
           "integrationsLink": "Intégrations",
           "skillHint": ". Une fois Linear connecté, des exemples d'utilisation restent disponibles sous Paramètres → Linear.",
-          "incompleteBannerBodyWithLinear": "Masquez les fournisseurs que vous n'utilisez pas, ou dépliez une carte et terminez ses étapes. Pour Linear : accès API, skill d'agent et Afficher dans Tâches."
+          "incompleteBannerBodyWithLinear": "Masquez les fournisseurs que vous n'utilisez pas, ou dépliez une carte et terminez ses étapes. Pour Linear : accès API, skill d'agent et Afficher dans Tâches.",
+          "autoRunTitle": "Lancer automatiquement les tâches choisies",
+          "autoRunDescription": "Quand vous démarrez un espace de travail depuis une tâche, l'agent commence tout de suite avec son lien. Désactivé, le lien reste dans la saisie de l'agent pour que vous le relisiez et l'envoyiez.",
+          "autoRunToggleLabel": "Activer ou désactiver le lancement automatique des tâches choisies"
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "Épaisseur de la ligne de séparation des volets.",
@@ -10626,7 +10629,9 @@
             "setup": "configuration",
             "apiKey": "clé API",
             "skill": "skill",
-            "connect": "connect"
+            "connect": "connect",
+            "autoRunTitle": "Lancer automatiquement les tâches choisies",
+            "autoRunDescription": "Démarre l'agent avec le lien de la tâche au lieu de le laisser en brouillon."
           }
         },
         "terminal": {

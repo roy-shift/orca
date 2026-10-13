@@ -8584,7 +8584,10 @@
           "integrationsHint": "Las credenciales de todos los proveedores también están en",
           "integrationsLink": "Integraciones",
           "skillHint": ". Después de conectar Linear, los ejemplos de uso están en Ajustes → Linear.",
-          "incompleteBannerBodyWithLinear": "Oculta los proveedores que no uses o expande una tarjeta y completa sus pasos. Para Linear: acceso a la API, la habilidad del agente y Mostrar en Tareas."
+          "incompleteBannerBodyWithLinear": "Oculta los proveedores que no uses o expande una tarjeta y completa sus pasos. Para Linear: acceso a la API, la habilidad del agente y Mostrar en Tareas.",
+          "autoRunTitle": "Ejecutar automáticamente las tareas elegidas",
+          "autoRunDescription": "Al iniciar un espacio de trabajo desde una tarea, el agente empieza de inmediato con su enlace. Desactivado deja el enlace en la entrada del agente para que lo revises y lo envíes.",
+          "autoRunToggleLabel": "Alternar la ejecución automática de las tareas elegidas"
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "Grosor de la línea divisoria del panel.",
@@ -10481,7 +10484,9 @@
             "setup": "configuración",
             "apiKey": "clave de API",
             "skill": "habilidad",
-            "connect": "conectar"
+            "connect": "conectar",
+            "autoRunTitle": "Ejecutar automáticamente las tareas elegidas",
+            "autoRunDescription": "Inicia el agente con el enlace de la tarea en lugar de dejarlo como borrador."
           }
         },
         "terminal": {
