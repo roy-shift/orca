@@ -299,6 +299,42 @@ printf 'arg=%s\\n' "$@"
     }
   )
 
+  // Why: a renamed build (a fork) cannot ship its executable as `Orca`, so the launcher reads the bundle.
+  it.skipIf(process.platform !== 'darwin')(
+    'runs the executable the bundle names when the app is renamed',
+    async () => {
+      const root = await mkdtemp(join(tmpdir(), 'orca-renamed-cli-'))
+      try {
+        const contents = join(root, 'Orca Shift.app', 'Contents')
+        const launcherPath = join(contents, 'Resources', 'bin', 'orca')
+        const electronPath = join(contents, 'MacOS', 'Orca Shift')
+        const cliPath = join(contents, 'Resources', 'app.asar.unpacked', 'out', 'cli', 'index.js')
+        await mkdir(dirname(launcherPath), { recursive: true })
+        await mkdir(dirname(electronPath), { recursive: true })
+        await mkdir(dirname(cliPath), { recursive: true })
+        await copyFile(darwinLauncherAsset, launcherPath)
+        await writeFile(cliPath, '', 'utf8')
+        await writeFile(
+          join(contents, 'Info.plist'),
+          `<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict><key>CFBundleExecutable</key><string>Orca Shift</string></dict></plist>
+`,
+          'utf8'
+        )
+        await writeFile(electronPath, '#!/usr/bin/env bash\necho renamed-executable-ran\n', {
+          encoding: 'utf8',
+          mode: 0o755
+        })
+
+        const result = await execFileAsync(launcherPath, ['--help'])
+
+        expect(result.stdout.trim()).toBe('renamed-executable-ran')
+      } finally {
+        await rm(root, { recursive: true, force: true })
+      }
+    }
+  )
+
   // Observe each launcher's actual child env and argv, including arguments with spaces.
   itRunsUnixShell.each(unixLauncherFixtures)(
     'sanitizes node env and forwards argv verbatim through the $name launcher',
