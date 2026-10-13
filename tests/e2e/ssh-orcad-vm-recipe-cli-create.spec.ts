@@ -103,6 +103,49 @@ test('creates a provisioned-root workspace from the CLI without taking over the 
     })
     expect(viewAfter).toEqual({ ...viewBefore, activePendingCreationId: null })
 
+    // A server inside the VM is reachable from the Mac through Orca's own SSH forward, which is
+    // how "Open in browser" works for a VM whose server has no browser of its own.
+    const vmNode = execDockerSshHostTargetCommand(
+      target,
+      'ls /root/.orca-remote/runtimes/*/bin/node | head -1'
+    )
+    execDockerSshHostTargetCommand(
+      target,
+      `nohup ${quotePosixShell(vmNode)} -e "require('http').createServer((q,r)=>r.end('vm-ok')).listen(8123,'127.0.0.1')" >/tmp/vm-http.log 2>&1 &`
+    )
+    const sshTargetId = await orcaPage.evaluate(async (hostId) => {
+      const environmentId = hostId.replace(/^runtime:/, '')
+      const environments = await window.api.runtimeEnvironments.list()
+      return environments.find((entry) => entry.id === environmentId)?.orcadDeployment?.sshTargetId
+    }, worktree.hostId ?? '')
+    expect(sshTargetId, 'the recipe VM has a hidden SSH target').toMatch(/^runtime-ssh-/)
+    const forward = await orcaPage.evaluate(
+      (targetId) =>
+        window.api.ssh.addPortForward({
+          targetId,
+          localPort: 0,
+          remoteHost: 'localhost',
+          remotePort: 8123
+        }),
+      sshTargetId!
+    )
+    try {
+      await expect
+        .poll(
+          async () => {
+            try {
+              return await (await fetch(`http://127.0.0.1:${forward.localPort}`)).text()
+            } catch {
+              return 'unreachable'
+            }
+          },
+          { timeout: 20_000, message: 'the VM server was not reachable through the forward' }
+        )
+        .toBe('vm-ok')
+    } finally {
+      await orcaPage.evaluate((id) => window.api.ssh.removePortForward({ id }), forward.id)
+    }
+
     // A recipe VM workspace is deleted from its own menu, which destroys the VM.
     const deleteItem = orcaPage.getByRole('menuitem', { name: 'Delete Workspace' })
     await expect(async () => {

@@ -15,6 +15,7 @@ import type {
 import type { LocalhostWorktreeLabelRoute } from '../../../shared/localhost-worktree-labels'
 import { runWorkspacePortScanForTarget } from './workspace-port-scan-client'
 import { browserUrlForPort } from './workspace-port-urls'
+import { openPortThroughVmForwardWhenServerHasNoBrowser } from './workspace-port-vm-forward'
 import { BROWSER_SCREENCAST_RUNTIME_CAPABILITY } from '../../../shared/protocol-version'
 import { RUNTIME_BROWSER_UNAVAILABLE_MESSAGE } from './client-creation-action-policy'
 
@@ -140,6 +141,18 @@ export async function openWorkspacePortInBrowser(args: {
   activateAndRevealWorktree(worktreeId, { providesInitialSurface: true })
   if (args.runtimeTarget.kind === 'environment') {
     try {
+      // Why: a recipe VM's server often has no browser to stream, but its port is reachable over the VM's SSH connection.
+      const forwarded = await openPortThroughVmForwardWhenServerHasNoBrowser({
+        environmentId: args.runtimeTarget.environmentId,
+        port: args.port,
+        openUrl: (forwardedUrl) =>
+          args.openInOrcaBrowser === false
+            ? window.api.shell.openUrl(forwardedUrl)
+            : void args.createBrowserTab(worktreeId, forwardedUrl, { activate: true })
+      })
+      if (forwarded) {
+        return forwarded
+      }
       await assertRuntimeEnvironmentCapability(
         args.runtimeTarget.environmentId,
         BROWSER_SCREENCAST_RUNTIME_CAPABILITY,

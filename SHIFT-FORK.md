@@ -9,6 +9,9 @@ next to regular Orca and keeps its own data, so you can run both.
 - **`orca worktree create --recipe <id>`** creates a workspace from an `environmentRecipes` entry in
   `orca.yaml`, the same way the New Workspace dialog does.
 - **Recipes are rows in the Run on picker**, not behind a "Per-Workspace Environment" submenu.
+- **Open in browser works for VM ports.** The VM's server has no browser to stream, so Orca forwards the port
+  through the VM's SSH connection (loopback only, reused and restored on reconnect) and opens
+  `http://127.0.0.1:<port>` in Orca's browser, or the system browser with ⇧⌘-click.
 - **Delete Workspace** works for a workspace whose checkout is the environment's own (`provisioned-root`).
 - **Run picked tasks automatically** (Settings → Tasks): starting a workspace from a task launches the agent on
   the task link instead of leaving it as a draft you have to send. Off by default.
