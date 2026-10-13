@@ -47,6 +47,21 @@ export function redactEphemeralVmRecipeDiagnosticText(text: string): string {
     )
 }
 
+const RECIPE_STDERR_TAIL_LINES = 8
+const RECIPE_STDERR_TAIL_MAX_CHARS = 1_200
+
+/** Adds the last lines a failed recipe script printed, so "exited with code 1" says why. */
+export function appendRecipeStderrTail(error: string, stderr: string | undefined): string {
+  const tail = redactEphemeralVmRecipeDiagnosticText(stderr ?? '')
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter(Boolean)
+    .slice(-RECIPE_STDERR_TAIL_LINES)
+    .join('\n')
+    .slice(-RECIPE_STDERR_TAIL_MAX_CHARS)
+  return tail ? `${error}\n${tail}` : error
+}
+
 export function redactEphemeralVmRecipeResultForDiagnostics(
   result: EphemeralVmRecipeResult
 ): EphemeralVmRecipeResult {

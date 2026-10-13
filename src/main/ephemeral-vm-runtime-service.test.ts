@@ -16,7 +16,8 @@ import {
   cleanupEphemeralVmRuntime,
   provisionEphemeralVmRuntime,
   resumeEphemeralVmRuntime,
-  stopEphemeralVmRuntimeCleanup
+  stopEphemeralVmRuntimeCleanup,
+  suspendEphemeralVmRuntime
 } from './ephemeral-vm-runtime-service'
 import type { OrcaVmRecipe } from '../shared/orca-yaml-hook-types'
 
@@ -638,5 +639,69 @@ describe('ephemeral VM runtime service', () => {
         recipeResult: { connection: { type: 'ssh' } }
       }
     })
+  })
+
+  it('says why a failed resume or suspend failed, without leaking credentials', async () => {
+    const userDataPath = makeDir('orca-ephemeral-vm-service-user-data-')
+    const repoPath = makeDir('orca-ephemeral-vm-service-repo-')
+    const failingScript = join(repoPath, 'fail.js')
+    writeFileSync(
+      failingScript,
+      [
+        'console.error("==> Starting container orca-1")',
+        'console.error("sshd did not come back up in time")',
+        'console.error("pair orca://pair?code=SECRETCODE123")',
+        'process.exit(1)'
+      ].join('\n')
+    )
+    const recipe: OrcaVmRecipe = {
+      id: 'local-docker-ssh',
+      name: 'Local Docker',
+      create: 'unused',
+      suspend: nodeCommand(failingScript),
+      resume: nodeCommand(failingScript),
+      destroyDisabled: true
+    }
+    upsertEphemeralVmRuntime(userDataPath, {
+      id: 'runtime-1',
+      recipeId: recipe.id,
+      recipe,
+      status: 'suspended',
+      connectionMode: 'ssh',
+      cleanupStatus: 'disabled',
+      cleanupDisabled: true,
+      createdAt: 1,
+      updatedAt: 1,
+      recipeResult: {
+        schemaVersion: 1,
+        connection: {
+          type: 'ssh',
+          projectRoot: '/workspace/original',
+          target: { label: 'VM', host: 'host', port: 22, username: 'orca' }
+        }
+      }
+    })
+
+    const resumed = await resumeEphemeralVmRuntime({
+      userDataPath,
+      repoPath,
+      recipe,
+      runtimeId: 'runtime-1'
+    })
+    const suspended = await suspendEphemeralVmRuntime({
+      userDataPath,
+      repoPath,
+      recipe,
+      runtimeId: 'runtime-1'
+    })
+
+    for (const result of [resumed, suspended]) {
+      expect(result.ok).toBe(false)
+      const error = result.ok ? '' : result.error
+      expect(error).toContain('exited with code 1')
+      expect(error).toContain('sshd did not come back up in time')
+      expect(error).toContain('orca://pair?code=[redacted]')
+      expect(error).not.toContain('SECRETCODE123')
+    }
   })
 })

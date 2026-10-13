@@ -13,6 +13,7 @@ import {
   type EphemeralVmRecipeStartFailure,
   type EphemeralVmRecipeStartSuccess
 } from './ephemeral-vm-recipe-runner'
+import { appendRecipeStderrTail } from '../shared/ephemeral-vm-recipe-diagnostics'
 import { cleanupFailedEphemeralVmStart } from './ephemeral-vm-failed-start-cleanup'
 import {
   persistProvisionedEphemeralVmRuntime,
@@ -226,7 +227,11 @@ export async function suspendEphemeralVmRuntime(
       status: 'suspend_failed',
       updatedAt: Date.now()
     })
-    return { ok: false, runtime: failed, error: suspend.error ?? 'Suspend failed.' }
+    return {
+      ok: false,
+      runtime: failed,
+      error: appendRecipeStderrTail(suspend.error ?? 'Suspend failed.', suspend.stderr)
+    }
   }
 
   const suspended = updateEphemeralVmRuntimeStatus(args.userDataPath, existing.id, {
@@ -260,7 +265,11 @@ export async function resumeEphemeralVmRuntime(
       status: 'resume_failed',
       updatedAt: Date.now()
     })
-    return { ok: false, runtime: failed, error: resume.error }
+    return {
+      ok: false,
+      runtime: failed,
+      error: appendRecipeStderrTail(resume.error, resume.stderr)
+    }
   }
 
   const resumeIntegrityError = resume.skipped
