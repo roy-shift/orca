@@ -15,6 +15,7 @@ const {
   assertOrcadTemplateBuilt,
   finalizePackagedOrcadTemplate,
   findOrcadTemplateMachOFiles,
+  packagedOrcadTemplateTargets,
   resealOrcadTemplateManifest,
   resealSignedWindowsApp
 } = require('./packaged-orcad-template.cjs')
@@ -74,6 +75,26 @@ describe('packaged orcad template', () => {
       await finalizePackagedOrcadTemplate(resourcesDir, { platform, signMacBinary })
     }
     expect(signMacBinary).not.toHaveBeenCalled()
+  })
+
+  it('ships every target unless a local build names a narrower set', async () => {
+    expect(packagedOrcadTemplateTargets({})).toBeUndefined()
+    expect(packagedOrcadTemplateTargets({ ORCA_ORCAD_TEMPLATE_TARGETS: ' , ' })).toBeUndefined()
+    expect(
+      packagedOrcadTemplateTargets({
+        ORCA_ORCAD_TEMPLATE_TARGETS: 'linux-arm64-glibc, darwin-arm64'
+      })
+    ).toEqual(['linux-arm64-glibc', 'darwin-arm64'])
+
+    // Packaging verifies against that set, so a template with other targets is refused.
+    const { resourcesDir } = await createResources()
+    await expect(
+      finalizePackagedOrcadTemplate(resourcesDir, {
+        platform: 'linux',
+        env: { ORCA_ORCAD_TEMPLATE_TARGETS: 'linux-arm64-glibc' },
+        signMacBinary: vi.fn()
+      })
+    ).rejects.toThrow('target manifest inventory')
   })
 
   it('still rejects a changed file that no signer touched', async () => {

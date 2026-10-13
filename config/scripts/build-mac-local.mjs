@@ -30,10 +30,14 @@ export function getLocalBuildIdentity() {
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(import.meta.filename)) {
   const identity = getLocalBuildIdentity()
+  // Why: a fork build reuses this script with its own config and a single arch (`build:fork`).
+  const [configFlag, configPath, ...extraArgs] = process.argv.slice(2)
+  const config =
+    configFlag === '--config' && configPath ? configPath : 'config/electron-builder.config.cjs'
   console.log(`[build:mac] local update version ${identity.version}`)
   execFileSync(
     process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm',
-    ['exec', 'electron-builder', '--config', 'config/electron-builder.config.cjs', '--mac'],
+    ['exec', 'electron-builder', '--config', config, '--mac', ...extraArgs],
     {
       env: {
         ...process.env,

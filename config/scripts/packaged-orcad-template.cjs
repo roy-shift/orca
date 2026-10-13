@@ -38,6 +38,18 @@ const orcadTemplateMacSignIgnore = ['/orcad-template/']
 // Mach-O thin (both byte orders, 32/64-bit) and fat headers.
 const MACH_O_MAGICS = new Set(['feedface', 'feedfacf', 'cefaedfe', 'cffaedfe', 'cafebabe'])
 
+/**
+ * `ORCA_ORCAD_TEMPLATE_TARGETS=a,b` names the targets a partial local template ships; unset means
+ * every target, which release packaging relies on.
+ */
+function packagedOrcadTemplateTargets(env = process.env) {
+  const targets = (env.ORCA_ORCAD_TEMPLATE_TARGETS ?? '')
+    .split(',')
+    .map((target) => target.trim())
+    .filter(Boolean)
+  return targets.length > 0 ? targets : undefined
+}
+
 /** Release packaging sets it; dev and local builds may ship without the template. */
 function isOrcadTemplateRequired(env = process.env) {
   return env.ORCA_REQUIRE_ORCAD_TEMPLATE === '1'
@@ -135,7 +147,7 @@ async function finalizePackagedOrcadTemplate(resourcesDir, options) {
     }
     resealOrcadTemplateManifest(templateDir, machO)
   }
-  verifyPackagedOrcadTemplate(resourcesDir)
+  verifyPackagedOrcadTemplate(resourcesDir, packagedOrcadTemplateTargets(env))
 }
 
 /** `inner-signing-list.txt` lines are app-relative Windows paths; keep the template's. */
@@ -165,6 +177,7 @@ module.exports = {
   finalizePackagedOrcadTemplate,
   findOrcadTemplateMachOFiles,
   isOrcadTemplateRequired,
+  packagedOrcadTemplateTargets,
   orcadTemplateExtraResource,
   orcadTemplateNodeModulesExtraResource,
   orcadTemplateMacSignIgnore,
