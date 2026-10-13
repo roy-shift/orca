@@ -106,8 +106,8 @@ describe('getDefaultSettings', () => {
     expect(getDefaultSettings('/tmp').compactWorktreeCards).toBe(false)
   })
 
-  it('keeps per-workspace environments disabled by default', () => {
-    expect(getDefaultSettings('/tmp').experimentalEphemeralVms).toBe(false)
+  it('turns per-workspace environments on by default in this fork', () => {
+    expect(getDefaultSettings('/tmp').experimentalEphemeralVms).toBe(true)
   })
 
   it('keeps the agent dashboard popout disabled by default', () => {

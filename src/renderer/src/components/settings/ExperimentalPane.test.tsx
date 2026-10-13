@@ -176,8 +176,8 @@ describe('ExperimentalPane', () => {
     expect(markup).not.toContain('Show idle agents')
   })
 
-  it('renders Cloud VM as an off-by-default experimental subsection', () => {
-    const settings = getDefaultSettings('/tmp')
+  it('renders Cloud VM as an experimental subsection that can be switched off', () => {
+    const settings = { ...getDefaultSettings('/tmp'), experimentalEphemeralVms: false }
     const markup = renderToStaticMarkup(
       <ExperimentalPane settings={settings} updateSettings={vi.fn()} />
     )
@@ -194,7 +194,10 @@ describe('ExperimentalPane', () => {
 
   it('enables Cloud VM through the experimental switch', async () => {
     const updateSettings = vi.fn()
-    const { root, container } = await renderExperimentalPane({ updateSettings })
+    const { root, container } = await renderExperimentalPane({
+      updateSettings,
+      settings: { ...getDefaultSettings('/tmp'), experimentalEphemeralVms: false }
+    })
 
     const switchButton = container.querySelector<HTMLButtonElement>(
       '#ephemeral-vms button[role="switch"]'

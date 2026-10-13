@@ -252,7 +252,8 @@ export function buildDefaultSettings(args: {
     experimentalAgentHibernation: false,
     agentHibernationIdleMs: 30 * 60 * 1000,
     experimentalNewWorktreeCardStyle: false,
-    experimentalEphemeralVms: false,
+    // Why: the Shift fork exists for per-workspace environments, so they work without a settings visit.
+    experimentalEphemeralVms: true,
     autoRunLinkedTaskPrompt: false,
     compactWorktreeCards: false,
     // Why: local desktop stays the default until the user picks a saved runtime environment.
