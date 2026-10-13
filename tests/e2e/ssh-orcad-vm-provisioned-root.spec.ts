@@ -102,6 +102,85 @@ test('adopts a recipe-provisioned SSH root without creating a linked worktree', 
       )
     ).toBe(expectedRefHead)
 
+    // The adopted root is the main worktree, so its panels must work like any linked one's.
+    await orcaPage.evaluate(() => {
+      const state = window.__store!.getState()
+      state.setRightSidebarTab('source-control')
+      state.setRightSidebarOpen(true)
+    })
+    await orcaPage.getByRole('button', { name: 'Explorer' }).click()
+    const explorer = orcaPage.locator('[data-orca-explorer-shell]')
+    const recipeRow = explorer.locator('[data-file-explorer-row]').filter({
+      has: orcaPage.locator('[data-file-explorer-row-name]').getByText('orca.yaml', { exact: true })
+    })
+    await expect(recipeRow).toBeVisible({ timeout: 30_000 })
+    await recipeRow.click()
+    const editor = orcaPage.locator('.monaco-editor').first()
+    await expect(editor).toBeVisible({ timeout: 25_000 })
+    const sentinel = `# saved-${Date.now()}`
+    await editor.click()
+    await orcaPage.keyboard.press('ControlOrMeta+End')
+    await orcaPage.keyboard.press('Enter')
+    await orcaPage.keyboard.type(sentinel)
+    await orcaPage.keyboard.press('ControlOrMeta+S')
+    await expect
+      .poll(
+        () =>
+          execDockerSshHostTargetCommand(
+            target!,
+            `grep -c ${quotePosixShell(sentinel)} ${quotePosixShell(`${DOCKER_SSH_HOST_REMOTE_REPO_PATH}/orca.yaml`)} || true`
+          ),
+        { timeout: 15_000, message: 'the save never reached the VM' }
+      )
+      .toBe('1')
+    await expect
+      .poll(
+        () =>
+          orcaPage.evaluate(
+            (id) =>
+              window.__store!.getState().gitStatusByWorktree[id]?.map((entry) => entry.path) ?? [],
+            adopted!.id
+          ),
+        { timeout: 30_000, message: 'Source Control never listed the saved change' }
+      )
+      .toContain('orca.yaml')
+
+    // A session recorded on the VM under the adopted root must list in the Agents panel.
+    const sessionId = 'cccccccc-dddd-4eee-8fff-000000000001'
+    const promptText = `provisioned root agent prompt ${Date.now()}`
+    const transcript = `${[
+      {
+        type: 'user',
+        sessionId,
+        cwd: DOCKER_SSH_HOST_REMOTE_REPO_PATH,
+        timestamp: new Date().toISOString(),
+        message: { role: 'user', content: promptText }
+      },
+      {
+        type: 'assistant',
+        sessionId,
+        timestamp: new Date().toISOString(),
+        message: { role: 'assistant', content: 'done' }
+      }
+    ]
+      .map((record) => JSON.stringify(record))
+      .join('\n')}\n`
+    execDockerSshHostTargetCommand(
+      target,
+      `d="$HOME/.claude/projects/-provisioned-root" && mkdir -p "$d" && echo ${quotePosixShell(
+        Buffer.from(transcript).toString('base64')
+      )} | base64 -d > "$d/${sessionId}.jsonl"`
+    )
+    await orcaPage.evaluate(() => {
+      const state = window.__store!.getState()
+      state.setRightSidebarTab('vault')
+      state.setRightSidebarOpen(true)
+    })
+    await orcaPage.getByRole('button', { name: 'Agents', exact: true }).click()
+    await expect(orcaPage.getByText(promptText, { exact: false }).first()).toBeVisible({
+      timeout: 60_000
+    })
+
     const removeDialog = orcaPage.getByRole('dialog', { name: 'Remove Project' })
     const removeMenuItem = orcaPage.getByRole('menuitem', { name: 'Remove Project from Orca' })
     await expect(async () => {
