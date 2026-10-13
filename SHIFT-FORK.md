@@ -13,6 +13,8 @@ next to regular Orca and keeps its own data, so you can run both.
 - **Run picked tasks automatically** (Settings → Tasks): starting a workspace from a task launches the agent on
   the task link instead of leaving it as a draft you have to send. Off by default.
 - **Resume and suspend failures say why**: the recipe script's last lines are shown in the error.
+- **Works out of the box**: Cloud VM is on by default, and the command line is wired to this app's own data and
+  command name, so it never collides with regular Orca.
 - **`pnpm install:fork`** installs a build after backing up your data, and keeps the previous app for rollback.
 
 The fork is based on upstream `main`, which already includes the managed-server support that recipe
@@ -34,20 +36,25 @@ Docker recipes also need Docker Desktop running.
 
 ## First run
 
-1. Open Settings → Experimental and turn on **Cloud VM**.
-2. Add your project. Recipes defined in its `orca.yaml` appear in the **Run on** picker of the New Workspace dialog.
-3. The first time you run a recipe, Orca asks you to trust the scripts in the repo.
+Cloud VM is on by default, so there is nothing to switch on.
 
-From a terminal, point the bundled CLI at this app's data folder:
+1. Add your project. Recipes defined in its `orca.yaml` appear in the **Run on** picker of the New Workspace dialog.
+2. The first time you run a recipe, Orca asks you to trust the scripts in the repo.
+
+### The command line
+
+- **Inside Orca Shift's terminals**, `orca` already works and talks to this app.
+- **From other terminals**, turn on Settings → General → CLI → **Shell command**. It installs `orca-shift` (in
+  `/usr/local/bin`, or `~/.local/bin` if that doesn't exist) and leaves regular Orca's `orca` alone.
+- Or call the launcher directly; it finds this app's data folder by itself:
+  `"/Applications/Orca Shift.app/Contents/Resources/bin/orca" worktree create ...`
 
 ```bash
-ORCA_USER_DATA_PATH="$HOME/Library/Application Support/Orca Shift" \
-  "/Applications/Orca Shift.app/Contents/Resources/bin/orca" \
-  worktree create --repo id:<repoId> --name my-feature --recipe <recipe-id>
+orca-shift worktree create --repo id:<repoId> --name my-feature --recipe <recipe-id>
 ```
 
-An alias keeps that short. `--recipe` works with `--repo`, `--name` and `--base-branch` only; flags such as
-`--agent` or `--parent-worktree` are refused rather than ignored.
+`--recipe` works with `--repo`, `--name` and `--base-branch` only; flags such as `--agent` or
+`--parent-worktree` are refused rather than ignored.
 
 ## Known limits
 
