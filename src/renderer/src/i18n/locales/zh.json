@@ -5672,6 +5672,7 @@
           "deleteWorktree": "删除工作树",
           "sleepWithDescendants": "与后代同眠 ({{value0}})",
           "sleepWithDescendantsDescription": "关闭此工作区中的活动面板以及每个嵌套的后代面板以释放内存和 CPU。",
+          "deleteRecipeVmWorkspace": "删除工作区",
           "deleteWithDescendants": "与后代一起删除..."
         },
         "WorktreeList": {

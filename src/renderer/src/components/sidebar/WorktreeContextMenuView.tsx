@@ -39,6 +39,7 @@ import { WorktreeContextMenuOverlays } from './WorktreeContextMenuOverlays'
 import {
   WORKTREE_CONTEXT_MENU_SCOPE_ATTR,
   getWorktreeParentPickerLabel,
+  isRecipeVmWorkspaceRow,
   isWorktreeParentPickerDisabled,
   shouldIgnoreNestedWorktreeContextMenuScope,
   shouldRevealWorktreeDeveloperMenu,
@@ -101,6 +102,7 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
     worktree,
     workspaceStatuses
   } = model
+  const isRecipeVmWorkspace = !isMultiContext && removesProject && isRecipeVmWorkspaceRow(worktree)
   const deleteShortcut = useOptionalShortcutLabel('workspace.delete')
   return (
     <div
@@ -316,7 +318,7 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
           {/* Why: primary checkout rows can't be git-worktree-removed, so keep a
              disabled Delete Worktree for parity with non-primary cards and pair
              it with the enabled Remove Project action below. */}
-          {!isMultiContext && removesProject ? (
+          {!isMultiContext && removesProject && !isRecipeVmWorkspace ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <div>
@@ -368,20 +370,25 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
                       'auto.components.sidebar.WorktreeContextMenu.250de158fd',
                       'Remove Workspace'
                     )
-                  : removesProject
+                  : isRecipeVmWorkspace
                     ? translate(
-                        'auto.components.sidebar.WorktreeContextMenu.f5ac91531d',
-                        'Remove Project from Orca'
+                        'auto.components.sidebar.WorktreeContextMenu.deleteRecipeVmWorkspace',
+                        'Delete Workspace'
                       )
-                    : lineageDescendantCount > 0
+                    : removesProject
                       ? translate(
-                          'auto.components.sidebar.WorktreeContextMenu.deleteWithDescendants',
-                          'Delete with Descendants…'
+                          'auto.components.sidebar.WorktreeContextMenu.f5ac91531d',
+                          'Remove Project from Orca'
                         )
-                      : translate(
-                          'auto.components.sidebar.WorktreeContextMenu.f4475537d8',
-                          'Delete'
-                        )}
+                      : lineageDescendantCount > 0
+                        ? translate(
+                            'auto.components.sidebar.WorktreeContextMenu.deleteWithDescendants',
+                            'Delete with Descendants…'
+                          )
+                        : translate(
+                            'auto.components.sidebar.WorktreeContextMenu.f4475537d8',
+                            'Delete'
+                          )}
             {!isMultiContext && !removesProject && deleteShortcut ? (
               <DropdownMenuShortcut>{deleteShortcut}</DropdownMenuShortcut>
             ) : null}

@@ -137,6 +137,13 @@ export function shouldRemoveProjectFromContextMenu(
   return repo != null && worktree.isMainWorktree
 }
 
+/** A recipe VM's checkout is the whole workspace, so removing the project is the delete. */
+export function isRecipeVmWorkspaceRow(
+  worktree: Pick<Worktree, 'ephemeralVmCheckoutMode' | 'isMainWorktree'>
+): boolean {
+  return worktree.isMainWorktree && worktree.ephemeralVmCheckoutMode === 'provisioned-root'
+}
+
 export function isContextWorktreeDeletable(
   worktree: Pick<Worktree, 'isMainWorktree'>,
   repo: Pick<Repo, 'kind'> | null | undefined

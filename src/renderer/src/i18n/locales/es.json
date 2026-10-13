@@ -5691,6 +5691,7 @@
           "deleteWorktree": "Eliminar worktree",
           "sleepWithDescendants": "Dormir con Descendientes ({{value0}})",
           "sleepWithDescendantsDescription": "Cierre los paneles activos en este espacio de trabajo y en todos los descendientes anidados para liberar memoria y CPU.",
+          "deleteRecipeVmWorkspace": "Eliminar espacio de trabajo",
           "deleteWithDescendants": "Eliminar con Descendientes…"
         },
         "WorktreeList": {

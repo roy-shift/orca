@@ -5979,6 +5979,7 @@
           "deleteWorktree": "Delete Worktree",
           "sleepWithDescendants": "Sleep with Descendants ({{value0}})",
           "sleepWithDescendantsDescription": "Close active panels in this workspace and every nested descendant to free up memory and CPU.",
+          "deleteRecipeVmWorkspace": "Delete Workspace",
           "deleteWithDescendants": "Delete with Descendants…"
         },
         "WorktreeList": {

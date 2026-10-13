@@ -5672,6 +5672,7 @@
           "deleteWorktree": "ワークツリーを削除",
           "sleepWithDescendants": "子孫と一緒に寝る ({{value0}})",
           "sleepWithDescendantsDescription": "このワークスペースとすべてのネストされた子孫のアクティブなパネルを閉じて、メモリと CPU を解放します。",
+          "deleteRecipeVmWorkspace": "ワークスペースを削除",
           "deleteWithDescendants": "子孫と一緒に削除…"
         },
         "WorktreeList": {
