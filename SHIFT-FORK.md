@@ -18,7 +18,7 @@ next to regular Orca and keeps its own data, so you can run both.
 - **Resume and suspend failures say why**: the recipe script's last lines are shown in the error.
 - **Works out of the box**: Cloud VM is on by default, and the command line is wired to this app's own data and
   command name, so it never collides with regular Orca.
-- **`pnpm install:fork`** installs a build after backing up your data, and keeps the previous app for rollback.
+- **`pnpm install:fork`** installs a build after backing up your data, and keeps the previous app for rollback outside Applications, so Spotlight does not list it.
 
 The fork is based on upstream `main`, which already includes the managed-server support that recipe
 environments need. Released Orca builds before that change cannot run these workspaces.

@@ -53,6 +53,13 @@ describe('defaultPaths', () => {
     expect(paths.backupRoot).not.toContain('/Application Support/orca/')
     expect(paths.installDir).toBe('/Users/me/Applications')
   })
+
+  it('keeps the rollback app out of Applications and out of the Spotlight index', () => {
+    const { rollbackDir } = defaultPaths('/Users/me')
+
+    expect(rollbackDir.startsWith('/Users/me/Applications')).toBe(false)
+    expect(rollbackDir.endsWith('.noindex')).toBe(true)
+  })
 })
 
 describe('backupDataDir', () => {
@@ -117,33 +124,59 @@ describe('swapInApp and rollbackApp', () => {
   it('keeps the replaced app and can put it back', async () => {
     const root = tempRoot()
     const installDir = join(root, 'Applications')
+    const rollbackDir = join(root, 'Rollback.noindex')
     const oldBuild = fakeApp(root, 'old-build', 'old')
     const newBuild = fakeApp(root, 'new-build', 'new')
-    await swapInApp({ builtApp: oldBuild, installDir, copyApp: plainCopy })
+    await swapInApp({ builtApp: oldBuild, installDir, rollbackDir, copyApp: plainCopy })
 
     const { installed, previous } = await swapInApp({
       builtApp: newBuild,
       installDir,
+      rollbackDir,
       copyApp: plainCopy
     })
 
     expect(readFileSync(join(installed, 'Contents', 'marker'), 'utf8')).toBe('new')
     expect(readFileSync(join(previous, 'Contents', 'marker'), 'utf8')).toBe('old')
+    expect(readdirSync(installDir)).toEqual(['Orca Shift.app'])
 
-    rollbackApp({ installDir })
+    rollbackApp({ installDir, rollbackDir })
 
     expect(readFileSync(join(installed, 'Contents', 'marker'), 'utf8')).toBe('old')
+  })
+
+  it('removes rollback copies older installs left in Applications', async () => {
+    const root = tempRoot()
+    const installDir = join(root, 'Applications')
+    fakeApp(installDir, 'Orca Shift.app.previous', 'legacy')
+    fakeApp(installDir, 'Orca Shift.app.rolled-back', 'legacy')
+
+    await swapInApp({
+      builtApp: fakeApp(root, 'new-build', 'new'),
+      installDir,
+      rollbackDir: join(root, 'Rollback.noindex'),
+      copyApp: plainCopy
+    })
+
+    expect(readdirSync(installDir)).toEqual(['Orca Shift.app'])
   })
 
   it('leaves the installed app alone when the copy fails', async () => {
     const root = tempRoot()
     const installDir = join(root, 'Applications')
-    await swapInApp({ builtApp: fakeApp(root, 'good', 'good'), installDir, copyApp: plainCopy })
+    const rollbackDir = join(root, 'Rollback.noindex')
+    await swapInApp({
+      builtApp: fakeApp(root, 'good', 'good'),
+      installDir,
+      rollbackDir,
+      copyApp: plainCopy
+    })
 
     await expect(async () =>
       swapInApp({
         builtApp: fakeApp(root, 'bad', 'bad'),
         installDir,
+        rollbackDir,
         copyApp: () => {
           throw new Error('disk full')
         }
@@ -156,9 +189,13 @@ describe('swapInApp and rollbackApp', () => {
   })
 
   it('refuses to roll back when there is nothing to roll back to', () => {
-    expect(() => rollbackApp({ installDir: join(tempRoot(), 'Applications') })).toThrow(
-      'No previous app'
-    )
+    const root = tempRoot()
+    expect(() =>
+      rollbackApp({
+        installDir: join(root, 'Applications'),
+        rollbackDir: join(root, 'Rollback.noindex')
+      })
+    ).toThrow('No previous app')
   })
 })
 

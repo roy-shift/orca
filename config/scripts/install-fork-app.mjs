@@ -4,6 +4,9 @@
  *
  *   pnpm install:fork                    install dist/mac-arm64/Orca Shift.app
  *   pnpm install:fork --rollback         put the previous app back (data is left as it is)
+ *
+ * The replaced app is kept outside Applications, in a `.noindex` folder: there Spotlight and
+ * Launchpad neither list it as a second Orca Shift nor surface its nested helper apps.
  *   pnpm install:fork --restore-data <backup>   replace the data folder with a backup
  */
 import { execFileSync } from 'node:child_process'
@@ -30,7 +33,8 @@ export function defaultPaths(home = homedir()) {
   return {
     dataDir: join(home, 'Library', 'Application Support', 'Orca Shift'),
     backupRoot: join(home, 'Library', 'Application Support', 'Orca Shift Backups'),
-    installDir: join(home, 'Applications')
+    installDir: join(home, 'Applications'),
+    rollbackDir: join(home, 'Library', 'Application Support', 'Orca Shift Rollback.noindex')
   }
 }
 
@@ -61,11 +65,13 @@ export function backupDataDir({ dataDir, backupRoot, now = Date.now(), keep = BA
   return target
 }
 
-/** Installs `builtApp`, moving the app it replaces to `<name>.previous`. */
-export function swapInApp({ builtApp, installDir, copyApp = copyBundle }) {
+/** Installs `builtApp`, moving the app it replaces into `rollbackDir`. */
+export function swapInApp({ builtApp, installDir, rollbackDir, copyApp = copyBundle }) {
   const installed = join(installDir, APP_NAME)
-  const previous = `${installed}.previous`
+  const previous = join(rollbackDir, APP_NAME)
   mkdirSync(installDir, { recursive: true })
+  mkdirSync(rollbackDir, { recursive: true })
+  removeLegacyRollbackCopies(installed)
   const staged = `${installed}.incoming`
   rmSync(staged, { recursive: true, force: true })
   // Why: copy beside the target first, so a failed copy never leaves a half-installed app.
@@ -78,14 +84,15 @@ export function swapInApp({ builtApp, installDir, copyApp = copyBundle }) {
   return { installed, previous: existsSync(previous) ? previous : null }
 }
 
-export function rollbackApp({ installDir }) {
+export function rollbackApp({ installDir, rollbackDir }) {
   const installed = join(installDir, APP_NAME)
-  const previous = `${installed}.previous`
+  const previous = join(rollbackDir, APP_NAME)
   if (!existsSync(previous)) {
     throw new Error(`No previous app to roll back to at ${previous}`)
   }
-  const rejected = `${installed}.rolled-back`
+  const rejected = join(rollbackDir, 'rolled-back', APP_NAME)
   rmSync(rejected, { recursive: true, force: true })
+  mkdirSync(join(rejected, '..'), { recursive: true })
   if (existsSync(installed)) {
     renameSync(installed, rejected)
   }
@@ -102,6 +109,13 @@ export function restoreDataDir({ backupDir, dataDir, backupRoot, now = Date.now(
   rmSync(dataDir, { recursive: true, force: true })
   cpSync(backupDir, dataDir, { recursive: true })
   return safety
+}
+
+// Why: older installs kept these beside the app, where macOS lists their nested helper apps.
+function removeLegacyRollbackCopies(installed) {
+  for (const suffix of ['.previous', '.rolled-back']) {
+    rmSync(`${installed}${suffix}`, { recursive: true, force: true })
+  }
 }
 
 function copyBundle(from, to) {
@@ -144,7 +158,7 @@ function main(argv) {
   console.log(
     backup ? `[install:fork] data backed up to ${backup}` : '[install:fork] no data to back up yet'
   )
-  const { installed, previous } = swapInApp({ builtApp, installDir: paths.installDir })
+  const { installed, previous } = swapInApp({ builtApp, ...paths })
   // Why: the build output would otherwise show up as a second app in Spotlight and Launchpad.
   rmSync(builtApp, { recursive: true, force: true })
   console.log(`[install:fork] installed ${installed}`)
