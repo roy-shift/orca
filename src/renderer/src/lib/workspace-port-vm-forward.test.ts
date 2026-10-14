@@ -5,9 +5,11 @@ import { findRecipeVmSshTargetId, openPortThroughVmForward } from './workspace-p
 
 const listPortForwards = vi.fn()
 const addPortForward = vi.fn()
+const removePortForward = vi.fn()
 const listEnvironments = vi.fn()
 
 const TARGET = 'runtime-ssh-orca-1234'
+const OTHER_VM = 'runtime-ssh-orca-5678'
 
 function port(overrides: Partial<WorkspacePort> = {}): WorkspacePort {
   // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: only the fields the forwarder reads are populated.
@@ -38,11 +40,12 @@ beforeEach(() => {
   // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: only the preload calls the forwarder makes are stubbed.
   globalThis.window = {
     api: {
-      ssh: { listPortForwards, addPortForward },
+      ssh: { listPortForwards, addPortForward, removePortForward },
       runtimeEnvironments: { list: listEnvironments }
     }
   } as never
   listPortForwards.mockResolvedValue([])
+  removePortForward.mockResolvedValue(null)
   addPortForward.mockImplementation(async (args: { localPort: number; remotePort: number }) =>
     entry({ localPort: args.localPort || 49321, remotePort: args.remotePort })
   )
@@ -82,13 +85,74 @@ describe('openPortThroughVmForward', () => {
   })
 
   it('reuses a forward that already exists instead of adding another', async () => {
-    listPortForwards.mockResolvedValue([entry({ localPort: 4555 })])
+    listPortForwards.mockResolvedValue([entry()])
     const openUrl = vi.fn()
 
     await openPortThroughVmForward({ sshTargetId: TARGET, port: port(), openUrl })
 
     expect(addPortForward).not.toHaveBeenCalled()
-    expect(openUrl).toHaveBeenCalledWith('http://127.0.0.1:4555')
+    expect(removePortForward).not.toHaveBeenCalled()
+    expect(openUrl).toHaveBeenCalledWith('http://127.0.0.1:3000')
+  })
+
+  it('takes the port number from another recipe VM, so a redirect to it reaches this workspace', async () => {
+    listPortForwards.mockResolvedValue([entry({ id: 'pf-other', connectionId: OTHER_VM })])
+    const openUrl = vi.fn()
+
+    await openPortThroughVmForward({ sshTargetId: TARGET, port: port(), openUrl })
+
+    expect(removePortForward).toHaveBeenCalledWith({ id: 'pf-other' })
+    expect(removePortForward.mock.invocationCallOrder[0]).toBeLessThan(
+      addPortForward.mock.invocationCallOrder[0]
+    )
+    expect(addPortForward).toHaveBeenCalledWith(
+      expect.objectContaining({ targetId: TARGET, localPort: 3000 })
+    )
+    expect(openUrl).toHaveBeenCalledWith('http://127.0.0.1:3000')
+  })
+
+  it('moves its own fallback forward onto the port number and closes the fallback', async () => {
+    listPortForwards.mockResolvedValue([
+      entry({ id: 'pf-other', connectionId: OTHER_VM }),
+      entry({ id: 'pf-fallback', localPort: 52000 })
+    ])
+    const openUrl = vi.fn()
+
+    await openPortThroughVmForward({ sshTargetId: TARGET, port: port(), openUrl })
+
+    expect(removePortForward.mock.calls.map(([args]) => args.id)).toEqual([
+      'pf-other',
+      'pf-fallback'
+    ])
+    expect(openUrl).toHaveBeenCalledWith('http://127.0.0.1:3000')
+  })
+
+  it('keeps its fallback forward while something outside Orca holds the port number', async () => {
+    listPortForwards.mockResolvedValue([entry({ id: 'pf-fallback', localPort: 52000 })])
+    addPortForward.mockRejectedValue(new Error('EADDRINUSE'))
+    const openUrl = vi.fn()
+
+    await openPortThroughVmForward({ sshTargetId: TARGET, port: port(), openUrl })
+
+    expect(removePortForward).not.toHaveBeenCalled()
+    expect(addPortForward).toHaveBeenCalledTimes(1)
+    expect(openUrl).toHaveBeenCalledWith('http://127.0.0.1:52000')
+  })
+
+  it('never takes the port number from an SSH host the user added', async () => {
+    listPortForwards.mockResolvedValue([entry({ id: 'pf-mine', connectionId: 'my-saved-host' })])
+    addPortForward.mockImplementation(async (args: { localPort: number; remotePort: number }) => {
+      if (args.localPort === 3000) {
+        throw new Error('EADDRINUSE')
+      }
+      return entry({ localPort: 52000, remotePort: args.remotePort })
+    })
+    const openUrl = vi.fn()
+
+    await openPortThroughVmForward({ sshTargetId: TARGET, port: port(), openUrl })
+
+    expect(removePortForward).not.toHaveBeenCalled()
+    expect(openUrl).toHaveBeenCalledWith('http://127.0.0.1:52000')
   })
 
   it('takes any free local port when the same number is busy', async () => {

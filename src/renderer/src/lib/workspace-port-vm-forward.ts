@@ -1,7 +1,7 @@
 import { getRecipeVmSshTargetForHost } from '@/lib/recipe-vm-managed-host'
 import { runtimeEnvironmentSupportsCapability } from '@/runtime/runtime-rpc-client'
 import { browserUrlForPortForwardEntry } from '@/lib/workspace-port-urls'
-import { toRuntimeExecutionHostId } from '../../../shared/execution-host'
+import { isRuntimeOwnedSshTargetId, toRuntimeExecutionHostId } from '../../../shared/execution-host'
 import { BROWSER_SCREENCAST_RUNTIME_CAPABILITY } from '../../../shared/protocol-version'
 import type { PortForwardEntry } from '../../../shared/ssh-types'
 import type { WorkspacePort } from '../../../shared/workspace-ports'
@@ -32,15 +32,49 @@ function remoteHostForPort(port: WorkspacePort): string {
   return isLoopbackRemoteHost(port.connectHost) ? 'localhost' : port.connectHost
 }
 
+async function removeForward(id: string): Promise<void> {
+  try {
+    await window.api.ssh.removePortForward({ id })
+  } catch {
+    // Why: a forward that will not close leaves its port busy, which the add below already handles.
+  }
+}
+
+async function addForward(
+  request: { targetId: string; remoteHost: string; remotePort: number; label: string },
+  localPort: number
+): Promise<PortForwardEntry | string> {
+  try {
+    return await window.api.ssh.addPortForward({ ...request, localPort })
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error)
+  }
+}
+
 async function ensureForward(
   targetId: string,
   port: WorkspacePort
 ): Promise<PortForwardEntry | string> {
-  const existing = (await window.api.ssh.listPortForwards({ targetId })).find(
-    (entry) => entry.remotePort === port.port && isLoopbackRemoteHost(entry.remoteHost)
+  const forwards = await window.api.ssh.listPortForwards()
+  const own = forwards.find(
+    (entry) =>
+      entry.connectionId === targetId &&
+      entry.remotePort === port.port &&
+      isLoopbackRemoteHost(entry.remoteHost)
   )
-  if (existing) {
-    return existing
+  if (own?.localPort === port.port) {
+    return own
+  }
+  // Why: app URLs such as a login redirect name this port, so the workspace being opened takes it
+  // from another recipe VM. Forwards on hosts the user added are never taken.
+  const holder = forwards.find(
+    (entry) =>
+      entry.localPort === port.port &&
+      entry.connectionId !== targetId &&
+      isRuntimeOwnedSshTargetId(entry.connectionId)
+  )
+  if (holder) {
+    await removeForward(holder.id)
   }
   const request = {
     targetId,
@@ -48,17 +82,15 @@ async function ensureForward(
     remotePort: port.port,
     label: port.processName ? `${port.processName} :${port.port}` : `VM :${port.port}`
   }
-  // Why the same number first: it matches what the app prints, so URLs and cookies line up.
-  // A busy port falls back to any free one rather than failing the click.
-  try {
-    return await window.api.ssh.addPortForward({ ...request, localPort: port.port })
-  } catch {
-    try {
-      return await window.api.ssh.addPortForward({ ...request, localPort: 0 })
-    } catch (error) {
-      return error instanceof Error ? error.message : String(error)
+  const claimed = await addForward(request, port.port)
+  if (typeof claimed !== 'string') {
+    if (own) {
+      await removeForward(own.id)
     }
+    return claimed
   }
+  // Why: a port busy outside Orca falls back to any free one rather than failing the click.
+  return own ?? addForward(request, 0)
 }
 
 /**

@@ -11,7 +11,9 @@ next to regular Orca and keeps its own data, so you can run both.
 - **Recipes are rows in the Run on picker**, not behind a "Per-Workspace Environment" submenu.
 - **Open in browser works for VM ports.** The VM's server has no browser to stream, so Orca forwards the port
   through the VM's SSH connection (loopback only, reused and restored on reconnect) and opens
-  `http://127.0.0.1:<port>` in Orca's browser, or the system browser with ⇧⌘-click.
+  `http://127.0.0.1:<port>` in Orca's browser, or the system browser with ⇧⌘-click. When two VM workspaces use
+  the same port, the one you open takes the port number from the other, so a login that redirects to
+  `localhost:<port>` lands in the workspace you are looking at. Open the other one again to take it back.
 - **Delete Workspace** works for a workspace whose checkout is the environment's own (`provisioned-root`).
 - **Run picked tasks automatically** (Settings → Tasks): starting a workspace from a task launches the agent on
   the task link instead of leaving it as a draft you have to send. Off by default.
