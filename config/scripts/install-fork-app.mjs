@@ -33,7 +33,8 @@ export function defaultPaths(home = homedir()) {
   return {
     dataDir: join(home, 'Library', 'Application Support', 'Orca Shift'),
     backupRoot: join(home, 'Library', 'Application Support', 'Orca Shift Backups'),
-    installDir: join(home, 'Applications'),
+    // Why: Finder's Applications sidebar shows this folder, not ~/Applications.
+    installDir: '/Applications',
     rollbackDir: join(home, 'Library', 'Application Support', 'Orca Shift Rollback.noindex')
   }
 }

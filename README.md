@@ -20,7 +20,11 @@
   Run Codex, ClaudeCode, OpenCode or Pi side-by-side — each in its own worktree, tracked in one place.
 </p>
 
-<h3 align="center"><a href="https://onorca.dev/download"><ins>Download Orca</ins></a></h3>
+<h3 align="center"><a href="https://github.com/roy-shift/orca/releases/latest/download/Orca-Shift-arm64.zip"><ins>Download Orca Shift</ins></a> (macOS Apple Silicon)</h3>
+
+<p align="center">
+  <sub>This is <strong>Orca Shift</strong>, a fork of <a href="https://github.com/stablyai/orca">Orca</a> that runs each workspace in its own disposable environment. See <a href="SHIFT-FORK.md">SHIFT-FORK.md</a> for what it adds.</sub>
+</p>
 
 <p align="center">
   <img src="docs/assets/readme-hero.jpg" alt="Orca desktop app running agents in parallel worktrees, with the Orca mobile companion app in the corner" width="960" />
@@ -214,20 +218,17 @@ Works with **any CLI agent** — if it runs in a terminal, it runs in Orca.
 
 ## Install
 
-### Desktop — macOS, Windows, Linux
+### Orca Shift — macOS Apple Silicon
 
-- **[Download from onOrca.dev](https://onorca.dev/download)**
-- Or grab a build directly: [macOS Apple Silicon](https://github.com/stablyai/orca/releases/latest/download/orca-macos-arm64.dmg) · [macOS Intel](https://github.com/stablyai/orca/releases/latest/download/orca-macos-x64.dmg) · [Windows (.exe)](https://github.com/stablyai/orca/releases/latest/download/orca-windows-setup.exe) · [Linux AppImage](https://github.com/stablyai/orca/releases/latest/download/orca-linux.AppImage) · [All builds](https://github.com/stablyai/orca/releases/latest)
+1. **[Download Orca Shift](https://github.com/roy-shift/orca/releases/latest/download/Orca-Shift-arm64.zip)** and unzip it. [All releases](https://github.com/roy-shift/orca/releases)
+2. Move `Orca Shift.app` to `/Applications`.
+3. The app is not notarized, so clear the quarantine flag once:
+   ```bash
+   xattr -dr com.apple.quarantine "/Applications/Orca Shift.app"
+   ```
+4. Open it. It keeps its own data, so it runs next to regular Orca.
 
-_Or via a package manager:_
-
-```bash
-# macOS (Homebrew)
-brew install --cask stablyai/orca/orca
-
-# Arch Linux (AUR) — or stably-orca-git to build from source
-yay -S stably-orca-bin
-```
+Setup, known limits and building from source: [SHIFT-FORK.md](SHIFT-FORK.md). Upstream Orca for other platforms is at [onOrca.dev](https://onorca.dev/download).
 
 ### Mobile Companion — iOS, Android
 

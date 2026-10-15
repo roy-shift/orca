@@ -51,13 +51,13 @@ describe('defaultPaths', () => {
 
     expect(paths.dataDir).toBe('/Users/me/Library/Application Support/Orca Shift')
     expect(paths.backupRoot).not.toContain('/Application Support/orca/')
-    expect(paths.installDir).toBe('/Users/me/Applications')
+    expect(paths.installDir).toBe('/Applications')
   })
 
   it('keeps the rollback app out of Applications and out of the Spotlight index', () => {
     const { rollbackDir } = defaultPaths('/Users/me')
 
-    expect(rollbackDir.startsWith('/Users/me/Applications')).toBe(false)
+    expect(rollbackDir.startsWith('/Applications')).toBe(false)
     expect(rollbackDir.endsWith('.noindex')).toBe(true)
   })
 })

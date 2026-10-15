@@ -29,8 +29,8 @@ environments need. Released Orca builds before that change cannot run these work
 
 Orca Shift is for Apple Silicon Macs.
 
-1. Download `Orca-Shift-<version>-arm64.zip` from this repository's Releases and unzip it.
-2. Move `Orca Shift.app` to `/Applications` (or `~/Applications`).
+1. Download `Orca-Shift-arm64.zip` from this repository's [latest release](https://github.com/roy-shift/orca/releases/latest) and unzip it.
+2. Move `Orca Shift.app` to `/Applications`.
 3. The app is not notarized, so macOS blocks it the first time. Clear the quarantine flag once:
    ```bash
    xattr -dr com.apple.quarantine "/Applications/Orca Shift.app"
