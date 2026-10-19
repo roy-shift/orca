@@ -20,15 +20,27 @@ import {
 
 /** The server-side repo for a request already routed to `target`; `null` when it runs here. */
 export function getRuntimeRepoTarget(
-  state: AppState,
+  state: Pick<AppState, 'repos'>,
   repoPath: string,
   target: RuntimeClientTarget
 ): { target: { kind: 'environment'; environmentId: string }; repo: Repo } | null {
   if (target.kind !== 'environment') {
     return null
   }
-  const repo = getGitHubRepoLookupIndex(state.repos).findByPath(repoPath)
-  return repo ? { target, repo } : null
+  const firstPathMatch = getGitHubRepoLookupIndex(state.repos).findByPath(repoPath)
+  if (!firstPathMatch || isRepoOwnedByEnvironment(firstPathMatch, target.environmentId)) {
+    return firstPathMatch ? { target, repo: firstPathMatch } : null
+  }
+  // Why: runtimes provision the same checkout path, so a first-wins path match can name another runtime's repo and fail with repo_not_found.
+  const ownedRepo = state.repos.find(
+    (repo) => repo.path === repoPath && isRepoOwnedByEnvironment(repo, target.environmentId)
+  )
+  return { target, repo: ownedRepo ?? firstPathMatch }
+}
+
+function isRepoOwnedByEnvironment(repo: Repo, environmentId: string): boolean {
+  const owner = parseExecutionHostId(getRepoExecutionHostId(repo))
+  return owner?.kind === 'runtime' && owner.environmentId === environmentId
 }
 
 export function getPRRefreshOwnerRuntimeEnvironmentId(
