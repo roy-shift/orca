@@ -21,7 +21,8 @@ module.exports = {
   protocols: [{ name: FORK_PRODUCT_NAME, schemes: [FORK_NAME] }],
   // Why: the app's data folder follows its package name, so this keeps it apart from upstream's `orca`.
   extraMetadata: { ...base.extraMetadata, name: FORK_NAME, productName: FORK_PRODUCT_NAME },
-  mac: { ...base.mac, target: [{ target: 'dir', arch: ['arm64'] }] },
+  // Why ad-hoc: with no Developer ID the app was left unsealed, which macOS reports as "damaged" once downloaded.
+  mac: { ...base.mac, identity: '-', target: [{ target: 'dir', arch: ['arm64'] }] },
   // Why: an update check must look at this fork's releases, never upstream's.
   publish: { provider: 'github', owner: 'roy-shift', repo: 'orca', releaseType: 'release' }
 }

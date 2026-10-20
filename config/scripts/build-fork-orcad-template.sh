@@ -9,7 +9,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 NODE_VERSION="24.19.0"
 mkdir -p "$ROOT/out/orcad-prebuilds"
 
-docker run --rm --platform linux/arm64 \
+# Why -i: the build script arrives on stdin, which docker drops without it and then exits 0 having built nothing.
+docker run --rm -i --platform linux/arm64 \
 	-v "$ROOT":/src:ro \
 	-v "$ROOT/out/orcad-prebuilds":/out \
 	quay.io/pypa/manylinux_2_28_aarch64 bash -s "$NODE_VERSION" <<'CONTAINER'
