@@ -86,17 +86,12 @@ a newer build can migrate your data in a way an older build cannot read. When bu
 
 ## Building from source
 
-You need Node 24, pnpm 12.8.1, the Xcode command line tools, and Docker.
+You need Node 24, pnpm 12.18.0, the Xcode command line tools, and Docker.
 
 ```bash
 pnpm install
-# The mobile app is a separate workspace; its generated files are needed to package the app.
-(cd mobile && pnpm install --frozen-lockfile --ignore-scripts &&
-  node scripts/build-terminal-webview-engine.mjs &&
-  node scripts/build-mermaid-webview-engine.mjs &&
-  node scripts/build-mermaid-page-engine.mjs &&
-  node scripts/build-terminal-document-script.mjs &&
-  node scripts/build-rich-markdown-editor-script.mjs)
+# The app bundles the mobile web client; mobile is a separate workspace whose postinstall generates its files.
+pnpm -C mobile install --frozen-lockfile
 pnpm build:fork-template   # the Linux arm64 server the app deploys, built in Docker
 pnpm build:fork            # dist/mac-arm64/Orca Shift.app
 pnpm install:fork          # back up data, install, keep the old app
@@ -110,6 +105,6 @@ git fetch upstream --tags
 ```
 
 Rebase the fork's commits onto an upstream release tag rather than a moving `main`, rebuild the server
-template with the app (they must come from the same commit), and run
-`tests/e2e/ssh-orcad-vm-provisioned-root.spec.ts` and `tests/e2e/ssh-orcad-vm-recipe-cli-create.spec.ts`
-before adopting the new base.
+template with the app (they must come from the same commit), run `pnpm tc` and `pnpm test`, and
+create a **Local Docker (SSH)** workspace by hand before adopting the new base. Upstream removed the
+Docker-host e2e harness the fork's recipe VM specs ran on, so there is no automated end-to-end check.
