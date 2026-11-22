@@ -110,6 +110,6 @@ git fetch upstream --tags
 ```
 
 Rebase the fork's commits onto an upstream release tag rather than a moving `main`, rebuild the server
-template with the app (they must come from the same commit), and run
-`tests/e2e/ssh-orcad-vm-provisioned-root.spec.ts` and `tests/e2e/ssh-orcad-vm-recipe-cli-create.spec.ts`
-before adopting the new base.
+template with the app (they must come from the same commit), run `pnpm tc` and `pnpm test`, and
+create a **Local Docker (SSH)** workspace by hand before adopting the new base. Upstream removed the
+Docker-host e2e harness the fork's recipe VM specs ran on, so there is no automated end-to-end check.

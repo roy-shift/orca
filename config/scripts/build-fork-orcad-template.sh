@@ -18,7 +18,7 @@ set -euo pipefail
 export HOME=/root
 curl -fsSL "https://nodejs.org/dist/v$1/node-v$1-linux-arm64.tar.xz" | tar -xJ -C /opt
 export PATH="/opt/node-v$1-linux-arm64/bin:$PATH"
-npm i -g pnpm@12.8.1 >/dev/null
+npm i -g pnpm@12.18.0 >/dev/null
 mkdir /work
 # A copy keeps the host's node_modules and git state out of the container build.
 (cd /src && tar --exclude=./node_modules --exclude='./**/node_modules' --exclude=./out \
