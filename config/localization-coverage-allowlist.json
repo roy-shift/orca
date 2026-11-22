@@ -292,5 +292,45 @@
     "text": "Switch back to",
     "dynamic": false,
     "count": 1
+  },
+  {
+    "filePath": "src/renderer/src/lib/workspace/creation/recipe-worktree-create-request.ts",
+    "kind": "object-property:error",
+    "text": "Project not found:",
+    "dynamic": true,
+    "count": 1,
+    "reason": "Error replied to the `orca worktree create --recipe` CLI over RPC and printed in its terminal; CLI output is English."
+  },
+  {
+    "filePath": "src/renderer/src/lib/workspace/creation/recipe-worktree-create-request.ts",
+    "kind": "object-property:error",
+    "text": "Per-workspace environments are off. Turn on Cloud VM in Settings → Experimental.",
+    "dynamic": false,
+    "count": 1,
+    "reason": "Error replied to the `orca worktree create --recipe` CLI over RPC and printed in its terminal; CLI output is English."
+  },
+  {
+    "filePath": "src/renderer/src/lib/workspace/creation/recipe-worktree-create-request.ts",
+    "kind": "object-property:error",
+    "text": "Recipe not found:",
+    "dynamic": true,
+    "count": 1,
+    "reason": "Error replied to the `orca worktree create --recipe` CLI over RPC and printed in its terminal; CLI output is English."
+  },
+  {
+    "filePath": "src/renderer/src/lib/workspace/creation/recipe-worktree-create-request.ts",
+    "kind": "object-property:error",
+    "text": ". Available:",
+    "dynamic": true,
+    "count": 1,
+    "reason": "Error replied to the `orca worktree create --recipe` CLI over RPC and printed in its terminal; CLI output is English."
+  },
+  {
+    "filePath": "src/renderer/src/lib/workspace/creation/recipe-worktree-create-request.ts",
+    "kind": "object-property:error",
+    "text": "The workspace was created but is not in the app yet.",
+    "dynamic": false,
+    "count": 1,
+    "reason": "Error replied to the `orca worktree create --recipe` CLI over RPC and printed in its terminal; CLI output is English."
   }
 ]

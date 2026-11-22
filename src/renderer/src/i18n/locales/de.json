@@ -2728,7 +2728,6 @@
         "ephemeralVm": "Umgebung pro Arbeitsbereich",
         "chooseRunTarget": "Ziel auswählen",
         "noRunTargets": "Für dieses Projekt sind keine Ausführungsziele bereit.",
-        "perWorkspaceEnvHint": "Bei Bedarf eine Umgebung anhand eines Rezepts bereitstellen",
         "branchName": "Branch-Name",
         "branchNamePlaceholder": "feature/my-branch",
         "connectTimedOut": "Zeitüberschreitung beim Verbindungsaufbau. Die Verbindung wird möglicherweise noch im Hintergrund hergestellt.",

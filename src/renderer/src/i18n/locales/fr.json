@@ -2495,7 +2495,6 @@
         "ephemeralVm": "Environnement par espace de travail",
         "chooseRunTarget": "Choisir la cible",
         "noRunTargets": "Aucune cible d'exécution n'est prête pour ce projet.",
-        "perWorkspaceEnvHint": "Provisionner un environnement à la demande depuis une recette",
         "branchName": "Nom de branche",
         "branchNamePlaceholder": "feature/my-branch",
         "connectTimedOut": "La connexion a expiré. Elle se poursuit peut-être en arrière-plan.",

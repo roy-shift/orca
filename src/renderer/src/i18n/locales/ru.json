@@ -2787,7 +2787,6 @@
         "ephemeralVm": "Окружение для каждого рабочего пространства",
         "chooseRunTarget": "Выберите цель",
         "noRunTargets": "Для этого проекта нет готовых целей запуска.",
-        "perWorkspaceEnvHint": "Подготовить окружение по запросу из рецепта",
         "branchName": "Название ветки",
         "branchNamePlaceholder": "feature/my-branch",
         "connectTimedOut": "Время ожидания подключения истекло. Возможно, оно продолжается в фоновом режиме.",

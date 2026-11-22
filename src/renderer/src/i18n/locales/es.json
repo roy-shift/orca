@@ -2218,7 +2218,6 @@
         "ephemeralVm": "Entorno por espacio de trabajo",
         "chooseRunTarget": "Elegir destino",
         "noRunTargets": "No hay destinos de ejecución listos para este proyecto.",
-        "perWorkspaceEnvHint": "Provisiona un entorno bajo demanda a partir de una receta",
         "branchName": "Nombre de rama",
         "branchNamePlaceholder": "feature/my-branch",
         "connectTimedOut": "Se agotó el tiempo de conexión. Es posible que todavía se esté conectando en segundo plano.",

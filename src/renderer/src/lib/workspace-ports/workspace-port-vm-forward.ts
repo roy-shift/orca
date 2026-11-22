@@ -1,6 +1,7 @@
 import { getRecipeVmSshTargetForHost } from '@/runtime/ephemeral-vm/recipe-vm-managed-host'
 import { runtimeEnvironmentSupportsCapability } from '@/runtime/rpc/compatibility/runtime-capability-proof'
 import { browserUrlForPortForwardEntry } from './workspace-port-urls'
+import { openOwnedHttpLink } from '@/lib/browser/navigation/http-link-routing'
 import {
   isRuntimeOwnedSshTargetId,
   toRuntimeExecutionHostId
@@ -152,9 +153,14 @@ export async function openPortThroughVmForwardWhenServerHasNoBrowser(args: {
   ) {
     return null
   }
-  const openUrl = (url: string): Promise<void> | void =>
-    args.openInOrcaBrowser === false
-      ? window.api.shell.openUrl(url)
-      : void args.createBrowserTab(args.worktreeId, url, { activate: true })
+  // The forward listens on this desktop's loopback, so the link is local to it.
+  const openUrl = (url: string): void =>
+    void (args.openInOrcaBrowser === false
+      ? openOwnedHttpLink(url, {
+          worktreeId: null,
+          sourceOwner: { kind: 'local' },
+          forceSystemBrowser: true
+        })
+      : args.createBrowserTab(args.worktreeId, url, { activate: true }))
   return openPortThroughVmForward({ sshTargetId, port: args.port, openUrl })
 }

@@ -1,4 +1,5 @@
 import { useAppStore } from '@/store'
+import { selectWorktreesByRepo } from '@/store/workspaces/catalog/workspace-record-fields'
 import { buildQuickCreationRequest } from '@/hooks/composer-state/submission/quick-creation-request'
 import { runBackgroundWorktreeCreation } from '@/lib/workspace/creation/worktree-creation-flow'
 import { waitForWorktreeCreationOutcome } from '@/lib/workspace/creation/worktree-creation-outcome'
@@ -89,7 +90,7 @@ export async function runRecipeWorktreeCreateRequest(
   if (!outcome.ok) {
     return { requestId, error: outcome.error }
   }
-  const worktree = Object.values(useAppStore.getState().worktreesByRepo)
+  const worktree = Object.values(selectWorktreesByRepo(useAppStore.getState()))
     .flat()
     .find((entry) => entry.id === outcome.worktreeId)
   return worktree

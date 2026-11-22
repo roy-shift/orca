@@ -2661,7 +2661,6 @@
         "ephemeralVm": "ワークスペースごとの環境",
         "chooseRunTarget": "ターゲットを選択",
         "noRunTargets": "このプロジェクトには実行ターゲットが準備されていません。",
-        "perWorkspaceEnvHint": "レシピからオンデマンド環境をプロビジョニングする",
         "branchName": "ブランチ名",
         "branchNamePlaceholder": "feature/my-branch",
         "connectTimedOut": "接続がタイムアウトしました。バックグラウンドで接続が続いている可能性があります。",

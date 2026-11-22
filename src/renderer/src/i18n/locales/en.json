@@ -3720,7 +3720,6 @@
         "ephemeralVm": "Per-Workspace Environment",
         "chooseRunTarget": "Choose target",
         "noRunTargets": "No run targets are ready for this project.",
-        "perWorkspaceEnvHint": "Provision an on-demand environment from a recipe",
         "branchName": "Branch name",
         "branchNamePlaceholder": "feature/my-branch",
         "connectTimedOut": "Connection timed out. It may still be connecting in the background.",

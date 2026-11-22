@@ -5,6 +5,7 @@
 import type { Repo } from '../../../../shared/repository/repo-types'
 import type { Worktree } from '../../../../shared/worktree/types'
 import { isFolderRepo } from '../../../../shared/repository/repo-kind'
+import { getRepoRoutingConnectionId } from '../../../../shared/execution-host/execution-host'
 import type {
   RecipeWorktreeCreateRequest,
   RecipeWorktreeCreateResponse
@@ -32,7 +33,7 @@ export async function createRuntimeWorktreeFromRecipe(
   ports: RuntimeRecipeWorktreeCreatePorts
 ): Promise<{ worktree: Worktree }> {
   const repo = await ports.resolveRepo(params.repo)
-  if (isFolderRepo(repo) || repo.connectionId) {
+  if (isFolderRepo(repo) || getRepoRoutingConnectionId(repo)) {
     throw new Error('Recipe workspaces need a local Git project; this one is a folder or remote.')
   }
   if (!ports.requestRendererCreate) {
