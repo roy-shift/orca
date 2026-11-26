@@ -4,6 +4,7 @@ import type { ComposerSourceState } from './composer-source-state-contract'
 import { useSourceIdentityActions } from './linked-work-items/source-identity-actions'
 import { useComposerAttachmentDropState } from './attachments/composer-attachment-drop-state'
 import { useTargetChangeActions } from './workspace-target/target-change-actions'
+import { useRecipeLocalHostSync } from './workspace-target/recipe-local-checkout'
 import { useProjectTargetActions } from './workspace-target/project-target-actions'
 import { useBranchStartPointActions } from './workspace-start-point/branch-start-point-actions'
 import { useGitHubProviderSelection } from './linked-work-items/github-provider-selection'
@@ -87,6 +88,10 @@ export function useComposerSourceState(
     setStartFromResetHint: target.workspaceIdentityState.setStartFromResetHint,
     smartSourceSelectionRef: target.asyncComposerState.smartSourceSelectionRef
   })
+  useRecipeLocalHostSync(
+    target.runtimeTargetSelection,
+    targetChangeActions.handleProjectHostSetupChange
+  )
   const projectTargetActions = useProjectTargetActions({
     actionableHostIds: target.composerTargetStore.actionableHostIds,
     eligibleRepos: target.composerTargetStore.eligibleRepos,

@@ -18,6 +18,7 @@ import { useRuntimeStatusByEnvironmentId } from '@/store/slices/runtime-status/v
 import { useAppStore } from '@/store/index'
 import { repoIsRemote } from '../../../../../shared/agent-launch/startup/agent-launch-remote'
 import { buildProjectHostSetupOptions } from '@/lib/workspace/creation/project-host-setup-options'
+import { resolveRecipeCheckout } from './recipe-local-checkout'
 import { buildNewWorkspaceCreateTargetOptions } from '@/lib/workspace/creation/new-workspace-project-options'
 import { getRuntimeEnvironmentIdForRepo } from '@/lib/workspace/ownership/repo-runtime-owner'
 import { useEphemeralVmRecipeOptions } from '@/hooks/composer-state/workspace-target/useEphemeralVmRecipeOptions'
@@ -250,9 +251,8 @@ export function useComposerRuntimeTargetSelection(input: ComposerRuntimeTargetSe
   )
 
   // Key recipes by repo ID; updateRepo object replacement must not erase the user’s selection.
-  const selectedRecipeRepoId = selectedRepo?.id ?? null
-
-  const selectedRecipeRepoConnectionId = selectedRepo?.connectionId ?? null
+  const { localSetupKey: ephemeralVmRecipeLocalSetupKey, ...recipeCheckout } =
+    resolveRecipeCheckout(selectedRepo, projectHostSetupOptions, eligibleRepos)
 
   // Only probe enabled experiments or hidden features can raise setup errors.
   const ephemeralVmsEnabled = settings?.experimentalEphemeralVms === true
@@ -264,12 +264,9 @@ export function useComposerRuntimeTargetSelection(input: ComposerRuntimeTargetSe
     error: ephemeralVmRecipeError
   } = useEphemeralVmRecipeOptions({
     enabled: ephemeralVmsEnabled,
-    repoId: selectedRecipeRepoId,
-    repoIsGit: selectedRepoIsGit,
-    repoConnectionId: selectedRecipeRepoConnectionId,
-    repoExecutionHostId: selectedRepo ? getRepoExecutionHostId(selectedRepo) : null,
+    ...recipeCheckout,
     projectGroupTarget: isProjectGroupTarget,
-    initialRecipeId: initialEphemeralVmRecipeId
+    initialRecipeId: initialEphemeralVmRecipeId ?? settings?.defaultEphemeralVmRecipeId ?? undefined
   })
 
   // Why the shared gate: a paired server's own SSH target is read from that server (#25887).
@@ -329,13 +326,14 @@ export function useComposerRuntimeTargetSelection(input: ComposerRuntimeTargetSe
     projectOptions,
     selectedRepoRuntimeEnvironmentId,
     selectedRepoTarget,
-    selectedRecipeRepoId,
-    selectedRecipeRepoConnectionId,
+    selectedRecipeRepoId: recipeCheckout.repoId,
+    selectedRecipeRepoConnectionId: recipeCheckout.repoConnectionId,
     ephemeralVmsEnabled,
     ephemeralVmRecipes,
     selectedEphemeralVmRecipeId,
     setSelectedEphemeralVmRecipeId,
     ephemeralVmRecipeError,
+    ephemeralVmRecipeLocalSetupKey,
     selectedRepoConnectionId,
     selectedRepoSshState,
     selectedRepoSshStatus,

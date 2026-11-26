@@ -33,6 +33,8 @@ export function EphemeralVmsPane(): React.JSX.Element {
   const openModal = useAppStore((state) => state.openModal)
   const repos = useAppStore((state) => state.repos)
   const activeRepoId = useAppStore((state) => state.activeRepoId)
+  const defaultRecipeId = useAppStore((state) => state.settings?.defaultEphemeralVmRecipeId ?? null)
+  const updateSettings = useAppStore((state) => state.updateSettings)
   const setupRepo = pickEnvironmentSetupRepo(repos, activeRepoId)
   const [agentLaunching, setAgentLaunching] = useState(false)
   const activeSkillRuntime = useActiveProjectSkillRuntime()
@@ -282,7 +284,7 @@ export function EphemeralVmsPane(): React.JSX.Element {
             <p className="text-xs text-muted-foreground">
               {t(
                 'auto.components.settings.EphemeralVmsPane.recipesHelp',
-                'Recipes from orca.yaml and enabled plugins show up here, ready to launch a workspace on.'
+                'Recipes from orca.yaml and enabled plugins show up here, ready to launch a workspace on. The default one is preselected in Run on for new workspaces.'
               )}
             </p>
           </div>
@@ -317,6 +319,12 @@ export function EphemeralVmsPane(): React.JSX.Element {
                   recipe={recipe}
                   credentialEnvNames={credentialEnvNames}
                   onUse={() => openWorkspaceComposerForRecipe(entry.repoId, recipe.id)}
+                  isDefault={recipe.id === defaultRecipeId}
+                  onToggleDefault={() =>
+                    void updateSettings({
+                      defaultEphemeralVmRecipeId: recipe.id === defaultRecipeId ? null : recipe.id
+                    })
+                  }
                 />
               ))}
             </div>
