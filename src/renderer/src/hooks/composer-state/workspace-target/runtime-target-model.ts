@@ -62,6 +62,8 @@ export type ComposerRuntimeTargetModel = {
   selectedEphemeralVmRecipeId: string | null
   setSelectedEphemeralVmRecipeId: (recipeId: string | null) => void
   ephemeralVmRecipeError: string | null
+  /** The project's local checkout, while a recipe can only run there but another host is selected. */
+  ephemeralVmRecipeLocalSetupKey: string | null
   selectedRepoConnectionId: string | null
   selectedRepoSshState: SshConnectionState | null
   selectedRepoSshStatus: SshConnectionStatus | null

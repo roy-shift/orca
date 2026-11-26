@@ -483,8 +483,6 @@ export type GlobalSettings = GlobalSettingsBase & {
   experimentalWslHosts?: boolean
   /** Declined the add-project offer to run a `\wsl.localhost` project's distro as a host. */
   wslHostOfferDismissed?: boolean
-  /** Start the agent on a picked task's link instead of leaving it as an unsent draft. */
-  autoRunLinkedTaskPrompt?: boolean
   /** Compact worktree cards: hide the metadata row when title and branch say the same thing. */
   compactWorktreeCards: boolean
   /** Legacy persisted key from the Experimental rollout; new writes use compactWorktreeCards. */

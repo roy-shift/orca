@@ -131,7 +131,8 @@ export async function prepareQuickComposerStartup(
     : undefined
   const { prompt, draftPrompt } = resolveQuickCreateLinkedWorkItemPrompt(
     input.agent ? input.linkedWorkItem : null,
-    input.note
+    input.note,
+    { autoRun: input.settings?.autoRunLinkedTaskPrompt === true }
   )
   const settings = input.settings
     ? {

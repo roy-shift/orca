@@ -12966,6 +12966,8 @@
         },
         "EphemeralVmRecipeRow": {
           "useInWorkspace": "Use in workspace",
+          "default": "Default",
+          "makeDefault": "Make default",
           "envLimited": "Scripts only receive the variables listed in passEnv, plus PATH, HOME and similar basics.",
           "envNamesMore": "{{names}} +{{count}} more",
           "envExposedAllowlist": "Scripts run on this computer and receive these credentials from passEnv: {{names}}.",
@@ -13021,7 +13023,7 @@
           "copy": "Copy",
           "copied": "Copied",
           "recipes": "Recipes",
-          "recipesHelp": "Recipes from orca.yaml and enabled plugins show up here, ready to launch a workspace on.",
+          "recipesHelp": "Recipes from orca.yaml and enabled plugins show up here, ready to launch a workspace on. The default one is preselected in Run on for new workspaces.",
           "checking": "Checking recipes...",
           "none": "No recipes found yet.",
           "cloudVmSkillTitle": "Cloud VM setup skill",

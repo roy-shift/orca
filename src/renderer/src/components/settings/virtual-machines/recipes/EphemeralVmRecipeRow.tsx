@@ -1,4 +1,4 @@
-import { KeyRound, Play } from 'lucide-react'
+import { Check, KeyRound, Play } from 'lucide-react'
 import type React from 'react'
 import type { OrcaHooks } from '../../../../../../shared/workspace-setup/orca-yaml-hook-types'
 import { isRecipeEnvNamePassed } from '../../../../../../shared/remote-runtime/ephemeral-vm-recipes/ephemeral-vm-recipe-env'
@@ -17,13 +17,18 @@ export function EphemeralVmRecipeRow({
   entry,
   recipe,
   credentialEnvNames,
-  onUse
+  onUse,
+  isDefault,
+  onToggleDefault
 }: {
   entry: RecipeCatalogEntry
   recipe: Recipe
   /** Credential-like names in Orca's environment; null until loaded or when unavailable. */
   credentialEnvNames: readonly string[] | null
   onUse: () => void
+  /** Run on starts on this recipe in the new-workspace composer. */
+  isDefault?: boolean
+  onToggleDefault?: () => void
 }): React.JSX.Element {
   const t = useTranslate()
   const destroyLabel = recipe.destroyDisabled
@@ -44,6 +49,20 @@ export function EphemeralVmRecipeRow({
         <RecipeEnvExposure recipe={recipe} credentialEnvNames={credentialEnvNames} />
       </div>
       <div className="flex shrink-0 items-center gap-1">
+        {onToggleDefault ? (
+          <Button
+            type="button"
+            variant={isDefault ? 'secondary' : 'ghost'}
+            size="xs"
+            aria-pressed={isDefault === true}
+            onClick={onToggleDefault}
+          >
+            {isDefault ? <Check className="size-3" /> : null}
+            {isDefault
+              ? t('auto.components.settings.EphemeralVmRecipeRow.default', 'Default')
+              : t('auto.components.settings.EphemeralVmRecipeRow.makeDefault', 'Make default')}
+          </Button>
+        ) : null}
         <Button type="button" variant="outline" size="xs" className="gap-1.5" onClick={onUse}>
           <Play className="size-3" />
           {t('auto.components.settings.EphemeralVmRecipeRow.useInWorkspace', 'Use in workspace')}

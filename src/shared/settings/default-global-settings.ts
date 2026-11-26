@@ -307,6 +307,7 @@ export function buildDefaultSettings(args: {
     experimentalNewWorktreeCardStyle: true,
     // Why: the Shift fork exists for per-workspace environments, so they work without a settings visit.
     experimentalEphemeralVms: true,
+    defaultEphemeralVmRecipeId: null,
     experimentalWslHosts: false,
     experimentalOrchestrationPanel: false,
     autoRunLinkedTaskPrompt: false,
